@@ -2,7 +2,7 @@ Progress Tracker
 Current Phase: Setup
 
 GitHub repo created
-Upwork profile drafted
+[x] Upwork profile drafted
 Demo project 1: RAG chatbot
 Demo project 2: FastAPI + LLM
 Demo project 3: Dashboard
