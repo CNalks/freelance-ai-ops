@@ -13,7 +13,7 @@
 
 ## Overview
 
-Former product manager turned full-stack developer. I understand your business goals — not just your code requirements.
+Product manager turned full-stack developer. I understand your business goals — not just your code requirements.
 
 My focus: FastAPI backends and Python services that are clean, tested, and production-ready. I've integrated OpenAI and Anthropic APIs into real products, building LLM-powered features including RAG pipelines, chatbots, and automated workflows.
 
@@ -21,9 +21,9 @@ On the frontend, I deliver responsive dashboards using Tailwind CSS that look po
 
 What sets me apart: fast delivery, transparent communication, and documentation your team will actually use. I help founders and small teams ship MVPs quickly — without overengineering.
 
-Rate: $35/hr. Let's build something useful.
+Let's talk about what you're building.
 
-> **Character count:** ~703 / 800 limit
+> **Character count:** ~691 / 800 limit
 
 ---
 
