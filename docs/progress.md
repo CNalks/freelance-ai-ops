@@ -6,5 +6,5 @@ GitHub repo created
 Demo project 1: RAG chatbot
 [x] Demo project 2: FastAPI + LLM
 [x] Demo project 3: Dashboard
-Upwork account registered
+[x] Upwork account registered
 First proposal sent
