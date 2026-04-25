@@ -1,91 +1,116 @@
 # Proposal Drafts - 2026-04-25
 
-## Job: Ai receptionist - API integration
-**URL:** https://www.upwork.com/jobs/~022047961680505338458
+## Job: AI Developer (Voice-First) | Build & Scale Lead Agent for UK Property Business
+
+URL: https://www.upwork.com/jobs/~022048053834859864725
 
 ### Cover Letter
 
-Your system is already 90% complete, so I would not rebuild it. The key is to trace the Vapi -> Make.com -> iCmed API flow and isolate why slot calculation fails during booking.
+Your workflow is a strong fit for an AI operations agent: inbound SpareRoom leads, WhatsApp follow-ups, outbound calls, reminders, and daily reporting all need one reliable process instead of scattered tools.
 
-I work on Python/FastAPI backends, AI/LLM integrations, and automation workflows. My approach would be: reproduce the incorrect slot behavior, inspect payloads between each step, tighten the appointment matching logic, then document the final flow so the clinic can maintain it.
+I build Python/FastAPI backends and AI/LLM integrations with a product-manager mindset, so I would start by mapping the lead lifecycle, then ship a focused MVP: lead intake, state tracking, scripted follow-up logic, API/webhook integrations, and clear reporting.
 
-Timeline estimate: 1-3 days for diagnosis and a focused fix, depending on API access.
+Relevant demos:
+- FastAPI + LLM backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+- RAG chatbot backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-rag-chatbot
 
-What is the exact booking error you are seeing now: wrong doctor, wrong time, or unavailable slot selected?
+My suggested first milestone is one working lead flow before expanding to calls and reporting.
+
+What channel should the first MVP automate: SpareRoom, WhatsApp, or outbound calls?
 
 ### Suggested Rate
-$35/hr or a fixed milestone within the $800 budget.
+
+$35/hr
 
 ---
 
-## Job: Skilled Developer for AI Image Generation Software
-**URL:** https://www.upwork.com/jobs/~022047861012140597205
+## Job: IVR & Surveys
+
+URL: https://www.upwork.com/jobs/~022048007551662912108
 
 ### Cover Letter
 
-Your goal is clear: make the image generation API consistent, not just visually impressive. Model lock, product lock, color variants, and predictable batch output are API/workflow reliability problems.
+I can build the Twilio SMS survey as a small backend MVP: upload/import contacts, send the first SMS, track each recipient's current question, save answers, and export the response data linked to phone number or email.
 
-I can help audit the current generation flow, identify where consistency breaks, and implement a cleaner API path with controlled inputs, repeatable variant handling, logging, and lower-cost retries only where needed. My background is AI API integration and backend workflow design, so I focus on making the system stable and maintainable.
+My background is Python/FastAPI backend work, API integrations, and documented MVP delivery. For this project I would keep the system simple: Twilio webhook endpoints, a lightweight database model, clear survey state handling, and basic logs so the flow is easy to test and maintain.
 
-Timeline estimate: 3-5 days for the first fix pass after reviewing the current implementation.
+I can also include keypad-only IVR as a separate milestone if SMS is working first.
 
-Which image model/provider is currently powering snap-shot.ai?
+Relevant backend demo:
+https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+
+Can you confirm whether the first version needs an admin upload screen, or is a CSV file import enough?
 
 ### Suggested Rate
-Fixed milestone within the $1,500 scope, or $35/hr for debugging.
+
+$150 fixed
 
 ---
 
-## Job: ATOM AI Web Developer Needed - Build Smart, Practical AI Features Into Live Platform
-**URL:** https://www.upwork.com/jobs/~022047905552430981781
+## Job: Voter Sorting and Canvassing Project
+
+URL: https://www.upwork.com/jobs/~022048015075917357717
 
 ### Cover Letter
 
-I like that you want practical AI features in a live platform, not experiments. That usually means the first step is choosing one high-value workflow and shipping it cleanly.
+This looks like two practical deliverables: clean and sort the voter data first, then make the canvassing workflow usable with mapping and outreach data.
 
-I can help define the first AI feature, map the user flow, connect the required LLM/API services, and implement the backend/frontend touchpoints needed for a working release. My work combines product thinking with Python/FastAPI backends, OpenAI/Anthropic integrations, and dashboard-style UI delivery.
+I can help build the Python/FastAPI backend, PostgreSQL/PostGIS data model, CSV/TXT import flow, cleaning rules, and API endpoints needed for canvassing. I would start by defining the exact sort criteria, then produce a working import/sort/export milestone before adding map or Twilio functionality.
 
-Timeline estimate: 3-7 days for the first scoped feature, depending on platform access.
+My strength is shipping focused MVP backends with clear documentation, so you can inspect the data flow and extend it later.
 
-What is the first AI feature users should experience in ATOM?
+Relevant demos:
+- FastAPI + LLM backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+- Dashboard UI: https://cnalks.github.io/freelance-ai-ops/
+
+What source format will the voter data arrive in: CSV, TXT, or another database export?
 
 ### Suggested Rate
-$35/hr or milestone-based within the $2,500 budget.
+
+$300 fixed
 
 ---
 
-## Job: Full Stack Developer
-**URL:** https://www.upwork.com/jobs/~022047678050850633479
+## Job: React Developer - Port & Deploy a Trauma Healing Companion App
+
+URL: https://www.upwork.com/jobs/~022047967345034382289
 
 ### Cover Letter
 
-Your two tracks need practical backend execution: the monetization engine with FastAPI/Redis/Postgres/AI logic, and the CRM replacement with AI agents around lead scoring, language support, and self-healing workflows.
+You already have the valuable part: a working prototype and a clear product concept. The job now is to turn it into a maintainable deployed PWA without losing the existing flow.
 
-I can take one defined backend slice, clarify inputs and outputs, implement the FastAPI/Python service logic, and document the result for your Vietnam team. I am strongest in FastAPI backends, OpenAI/LLM integration, PostgreSQL/Redis workflows, and MVP-style delivery where clear communication matters.
+I can help port the React JSX prototype, clean up the structure, connect Anthropic API for the support chat, and deploy the app on Vercel. My background combines product management and full-stack delivery, so I will keep the assessment, exercises, AI chat, and 3-month plan builder aligned with the reader journey rather than only moving code around.
 
-Timeline estimate: 3-5 days for a first useful milestone if scope is tight.
+Relevant dashboard demo:
+https://cnalks.github.io/freelance-ai-ops/
 
-Which project needs the first deliverable most urgently?
+AI backend examples:
+https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+
+Is the current prototype using browser-only state, or does it already persist user progress anywhere?
 
 ### Suggested Rate
-$10/hr if staying within the listed range; normal rate is $35/hr for this complexity.
+
+$35/hr
 
 ---
 
-## Job: AI Automation and CRM Scraping Expert Needed on Make.com
-**URL:** https://www.upwork.com/jobs/~022047768534590240921
+## Job: GeoFencing
+
+URL: https://www.upwork.com/jobs/~022048003342220643281
 
 ### Cover Letter
 
-Your deal sourcing workflow is a good fit for a staged MVP: intake sources first, structured CRM output second, AI summaries/scoring third, then reporting and follow-up tasks.
+I can build this as a focused 8-day MVP: define geofence areas, receive location updates, detect enter/exit events, and send Twilio SMS alerts when the event rules are triggered.
 
-I can help design the data model, connect scraping/intake sources, normalize opportunities, and use OpenAI/Claude to summarize, extract fields, score fit, and generate follow-up tasks before records enter HubSpot. My background covers AI automation, API integration, and product-focused workflow documentation.
+For a first version, I would keep the backend simple and testable: Python/FastAPI API endpoints, a small persistence layer for users and geofence definitions, event logic for inside/outside transitions, and clear setup notes for Render or VPS deployment.
 
-Timeline estimate: 1-2 weeks for a first working MVP depending on source complexity.
+My portfolio includes backend MVP and dashboard examples:
+- FastAPI + LLM backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+- Dashboard UI: https://cnalks.github.io/freelance-ai-ops/
 
-Which source should be automated first: broker websites, email alerts, or marketplace listings?
+Before estimating the final implementation detail, I would confirm one point: will location updates come from a mobile app, browser GPS, or another tracking source?
 
 ### Suggested Rate
-$35/hr or milestone-based within the $3,500 budget.
 
----
+$150 fixed
