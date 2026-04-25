@@ -1,171 +1,211 @@
-# Job Leads - 2026-04-24
+# Job Leads - 2026-04-25
 
 ## Search: FastAPI Python backend
 
 ### Job 1: Full Stack Developer
 - **URL:** https://www.upwork.com/jobs/~022047678050850633479
 - **Budget:** Hourly, $5.00-$10.00
-- **Posted:** 1 hour ago
+- **Posted:** Posted yesterday
 - **Proposals:** 10 to 15
-- **Client:** United States, 43% hire rate, $47K total spent
-- **Description summary:** Client needs help across two technical projects: an AI-powered monetization engine and an open-source CRM replacement. Work includes FastAPI, async Python, Pydantic, Redis, Postgres, Kubernetes, AI agents, forecasting, and integration with CRM/chat/video/file tools.
-- **Why good fit:** Strong match for FastAPI backend, AI agent workflows, API integration, and documented MVP delivery.
+- **Client:** United States, $40K+ spent, payment verified
+- **Description summary:** Client needs two full-stack developers for an AI monetization engine and an open-source CRM replacement. The work includes FastAPI, PostgreSQL, Redis, Kubernetes, AI agents, and integration across chat, video, files, and CRM workflows.
+- **Why good fit:** Strong fit for FastAPI backend work, AI agent workflows, API integration, and documented MVP delivery.
 - **Priority:** High
 
-### Job 2: QA Automation Engineer - Playwright + Stripe + PWA
-- **URL:** https://www.upwork.com/nx/search/jobs/?q=FastAPI%20Python%20backend&sort=recency
-- **Budget:** Hourly, $16.00-$50.00
-- **Posted:** 15 minutes ago
-- **Proposals:** Less than 5
-- **Client:** United States, payment verified, $70K+ spent
-- **Description summary:** Client has a luxury live-auction marketplace PWA near launch and needs Playwright regression coverage plus manual QA for Stripe card saves, live video bidding, and real-time state sync. The app is mostly built and needs pre-launch stabilization.
-- **Why good fit:** Partial fit through automation, backend QA, and product-minded release support, but less aligned with FastAPI/AI.
+### Job 2: Python Developer with FastAPI & Data Processing Expertise
+- **URL:** https://www.upwork.com/jobs/~022047673414472158161
+- **Budget:** Hourly
+- **Posted:** Posted yesterday
+- **Proposals:** 10 to 15
+- **Client:** Ukraine, $0 spent, payment verified
+- **Description summary:** Deep-tech studio needs a Python developer for an AI application in specialized professional domains. The visible stack includes Python, asyncio, FastAPI, pandas, PostgreSQL, NLP, knowledge graphs, and machine learning.
+- **Why good fit:** Direct match for Python/FastAPI backend and AI data workflow implementation.
 - **Priority:** Medium
 
-### Job 3: Python Developer with FastAPI and Data Processing Expertise
-- **URL:** https://www.upwork.com/nx/search/jobs/?q=FastAPI%20Python%20backend&sort=recency
-- **Budget:** Hourly, not fully listed in visible result
-- **Posted:** 1 hour ago
-- **Proposals:** Not listed in visible result
-- **Client:** Ukraine, payment unverified, $0 spent
-- **Description summary:** Visible result indicates Python, FastAPI, and data processing work. Client history and payment status do not meet the preferred filter.
-- **Why good fit:** Technical stack matches, but client risk is high because payment is unverified and no spend is visible.
-- **Priority:** Low
+### Job 3: Fullstack Developer (Python, Angular, GCP)
+- **URL:** https://www.upwork.com/jobs/~022047623799889832600
+- **Budget:** Hourly, $15.00-$25.00
+- **Posted:** Posted yesterday
+- **Proposals:** 5 to 10
+- **Client:** India, $10K+ spent, payment verified
+- **Description summary:** Client needs a full-stack developer with Python, Angular, and GCP for ongoing staff augmentation. The role is remote, long-term, and focused on supporting ongoing and new projects.
+- **Why good fit:** Good Python backend fit with a verified client and low proposal count, though less AI-specific.
+- **Priority:** Medium
+
+### Job 4: Backend Engineer - AI SaaS Platform (NestJS / AWS Lambda / LLM Integration)
+- **URL:** https://www.upwork.com/jobs/~022047772202113301082
+- **Budget:** Hourly
+- **Posted:** Posted 12 hours ago
+- **Proposals:** 20 to 50
+- **Client:** United Kingdom, $0 spent, payment verified
+- **Description summary:** Small team is building an AI-powered recruitment SaaS with NestJS, GraphQL, MongoDB, AWS Lambda, FastAPI, Anthropic Claude API, and Stripe. They want a backend/full-stack engineer who can extend a real product rather than just complete isolated tickets.
+- **Why good fit:** Strong technical fit for FastAPI plus LLM integration, but client history and proposal volume are weaker.
+- **Priority:** Medium
 
 ## Search: OpenAI API integration
 
-### Job 1: OpenClaw Multi-Agent Setup / Stability Expert Needed
-- **URL:** https://www.upwork.com/jobs/~022047697031771847258
-- **Budget:** Hourly, $25.00-$35.00
-- **Posted:** 25 minutes ago
-- **Proposals:** 20 to 50
-- **Client:** USA, 70% hire rate, $1.9K total spent
-- **Description summary:** Client has OpenClaw running on a Mac Mini with Telegram, cron jobs, OpenAI API, and several agents already configured. They need a stable seven-agent system with memory persistence, agent isolation, clean architecture, and Hermes monitoring.
-- **Why good fit:** Strong fit for OpenAI API integration, multi-agent architecture, debugging, and automation workflow design.
+### Job 1: Ai receptionist - API integration
+- **URL:** https://www.upwork.com/jobs/~022047961680505338458
+- **Budget:** Fixed price, $800
+- **Posted:** Posted 7 minutes ago
+- **Proposals:** Less than 5
+- **Client:** Romania, $0 spent, payment verified
+- **Description summary:** Client has a 90% complete AI voice receptionist for a medical clinic using Vapi, Make.com, and an iCmed clinic API. The remaining issue is slot calculation and API handoff for booking appointments correctly.
+- **Why good fit:** Excellent fit for AI voice workflow debugging, API integration, and pragmatic automation repair.
 - **Priority:** High
 
-### Job 2: Next.js + Sanity CMS Developer - Multilingual B2B Website with AI Content Pipeline and Chatbot
-- **URL:** https://www.upwork.com/nx/search/jobs/?q=OpenAI%20API%20integration&sort=recency
-- **Budget:** Fixed price, $6,000
-- **Posted:** 43 minutes ago
-- **Proposals:** 20 to 50
-- **Client:** Canada, payment verified, $0 spent
-- **Description summary:** Client is rebuilding a WordPress site into Next.js 14 and Sanity with seven languages, RTL support, and AI content automation from product PDFs. Work includes CMS modeling, multilingual product pages, and chatbot/content-pipeline features.
-- **Why good fit:** Good AI content pipeline and dashboard/frontend fit, but client history and proposal volume are weaker.
+### Job 2: Skilled Developer for AI Image Generation Software
+- **URL:** https://www.upwork.com/jobs/~022047861012140597205
+- **Budget:** Fixed price, $1,500
+- **Posted:** Posted 6 hours ago
+- **Proposals:** Less than 5
+- **Client:** United States, $2K+ spent, payment verified
+- **Description summary:** Client needs help fixing an AI image generation API for snap-shot.ai. Goals include model/product lock, correct views and color variants, fast generation, lower image cost, and more reliable batch output.
+- **Why good fit:** Good match for AI API debugging, backend integration, and making an existing AI product more reliable.
+- **Priority:** High
+
+### Job 3: AI Voice Agent Developer Needed for LLM and API Integration
+- **URL:** https://www.upwork.com/jobs/~022047910941650663577
+- **Budget:** Fixed price, $30
+- **Posted:** Posted 29 minutes ago
+- **Proposals:** 5 to 10
+- **Client:** United States, $7K+ spent, payment verified
+- **Description summary:** Client wants an AI voice agent built with LLMs and API integrations. The role involves conversational interface design, NLP, automation, and connecting the agent to services.
+- **Why good fit:** Strong AI/LLM integration fit, but the listed budget is very low.
 - **Priority:** Medium
 
-### Job 3: Full Stack Node.js React Developer for Web Application Fixes AWS OpenAI API TypeScript
-- **URL:** https://www.upwork.com/nx/search/jobs/?q=OpenAI%20API%20integration&sort=recency
-- **Budget:** Hourly, $20.00-$25.00
-- **Posted:** 1 hour ago
-- **Proposals:** 50+
-- **Client:** Israel, payment verified, $8K+ spent
-- **Description summary:** Client needs an existing AI-powered web app stabilized and improved, including UI/layout fixes, bug fixes, small features, and OpenAI integration work. The stack is React, Next.js, Node.js, AWS, OpenAI, and TypeScript.
-- **Why good fit:** Relevant AI app stabilization work, but proposal count is very high and stack is less Python-focused.
-- **Priority:** Low
+### Job 4: Senior Full-Stack Product Engineer (Growth & Fintech Systems)
+- **URL:** https://www.upwork.com/jobs/~022047933319667595417
+- **Budget:** Hourly, $40.00-$80.00
+- **Posted:** Posted 1 hour ago
+- **Proposals:** 10 to 15
+- **Client:** India, $0 spent, payment verified
+- **Description summary:** Client is building an AI-powered enterprise service platform for identity verification, document processing, donations, referral campaigns, compliance workflows, and dashboards.
+- **Why good fit:** Relevant AI workflow and dashboard/backend fit, but no visible client spend.
+- **Priority:** Medium
 
 ## Search: AI chatbot development
 
-### Job 1: Multi Agent AI System to Automate Repetitive Tasks
-- **URL:** https://www.upwork.com/jobs/~022047701481028788181
-- **Budget:** Hourly, $20.00-$25.00
-- **Posted:** 4 minutes ago
+### Job 1: ATOM AI Web Developer Needed - Build Smart, Practical AI Features Into Live Platform
+- **URL:** https://www.upwork.com/jobs/~022047905552430981781
+- **Budget:** Fixed price, $2,500
+- **Posted:** Posted 50 minutes ago
 - **Proposals:** Less than 5
-- **Client:** Singapore, 67% hire rate, $7.6K total spent
-- **Description summary:** Client wants a flexible multi-agent lead generation and follow-up system that researches industries/countries, finds contacts, stores data in Google Sheets, scores prospects, and drafts personalized emails until a human takes over.
-- **Why good fit:** Excellent match for AI automation, agent workflows, OpenAI integration, API work, and product-focused workflow design.
+- **Client:** Canada, $3K+ spent, payment verified
+- **Description summary:** Client wants practical AI features built into a live web platform, not experimental AI demos. They need someone who can build, integrate, and deploy AI-driven features that work in production.
+- **Why good fit:** Strong fit for product-minded AI integration and turning business needs into working MVP features.
 - **Priority:** High
 
-### Job 2: AI Programmer Needed for React and Laravel Web Development
-- **URL:** https://www.upwork.com/jobs/~022047701981800232711
-- **Budget:** Hourly, $5.00-$15.00
-- **Posted:** 1 minute ago
-- **Proposals:** Less than 5
-- **Client:** United States, 100% hire rate, $63K total spent
-- **Description summary:** Client has existing web and mobile apps with AI features and needs an AI programmer to optimize AI-driven functionality across React, Laravel, React Native, Azure, OpenAI, and other AI platforms.
-- **Why good fit:** Good AI integration and product-improvement fit, though Laravel/React Native are not the core profile stack.
+### Job 2: Senior Shopify CRO + AI Automation Expert
+- **URL:** https://www.upwork.com/jobs/~022047958636800696981
+- **Budget:** Fixed price, $1,000
+- **Posted:** Posted 19 minutes ago
+- **Proposals:** 5 to 10
+- **Client:** United States, $10K+ spent, payment verified
+- **Description summary:** Client wants a Shopify conversion overhaul plus automation, email/SMS flows, and an AI agent for an audiobook product. The scope combines UX, funnels, and automation.
+- **Why good fit:** Good AI automation and workflow fit, though Shopify/CRO is not the core profile stack.
 - **Priority:** Medium
 
-### Job 3: Web3 Developer Needed for Telegram Bot Creation
-- **URL:** https://www.upwork.com/nx/search/jobs/?q=AI%20chatbot%20development&sort=recency
-- **Budget:** Hourly, $15.00-$35.00
-- **Posted:** 2 minutes ago
-- **Proposals:** Not listed in visible result
-- **Client:** GBR, payment verified, $0 spent
-- **Description summary:** Client needs a Telegram bot for Web3 functionality, smart contract interaction, transaction management, and real-time user updates. This is bot work but mainly blockchain-focused.
-- **Why good fit:** Bot automation overlap exists, but Web3 focus and no visible client spend make it lower priority.
-- **Priority:** Low
+### Job 3: AI Voice Agent Developer Needed for LLM and API Integration
+- **URL:** https://www.upwork.com/jobs/~022047910941650663577
+- **Budget:** Fixed price, $30
+- **Posted:** Posted 29 minutes ago
+- **Proposals:** 5 to 10
+- **Client:** United States, $7K+ spent, payment verified
+- **Description summary:** Client needs an AI-driven voice agent using LLMs, APIs, NLP, and automation. The job is relevant to chatbot/voice-agent development but the budget appears too low for the scope.
+- **Why good fit:** Strong LLM/chatbot integration fit if budget can be clarified.
+- **Priority:** Medium
+
+### Job 4: High-End Website with AI Chatbox
+- **URL:** https://www.upwork.com/jobs/~022047948775481352149
+- **Budget:** Fixed price, $900
+- **Posted:** Posted 55 minutes ago
+- **Proposals:** 10 to 15
+- **Client:** United States, $0 spent, payment verified
+- **Description summary:** Client needs a high-end salon website with AI chatbox and booking system integration. The engagement is part-time over 1 to 3 months.
+- **Why good fit:** Relevant chatbot and booking workflow integration, but mostly website-focused.
+- **Priority:** Medium
 
 ## Search: LLM application development
 
-### Job 1: AI Developer - Search Directory Tool
-- **URL:** https://www.upwork.com/jobs/~022047612860752913045
-- **Budget:** Hourly, client asks freelancer to propose rate/budget
-- **Posted:** 5 hours ago
-- **Proposals:** Not visible in detail view
-- **Client:** GBR, 41% hire rate, $1.8K total spent
-- **Description summary:** UK social enterprise needs an existing web directory platform stabilized for pilot. Scope includes login/onboarding, separate admin dashboard, backend search controls, voice input, location/map behavior, responsive fixes, backend data accuracy, and Claude/Anthropic-style agentic systems.
-- **Why good fit:** Strong match for product management background, AI/LLM integration, backend workflow stabilization, voice/API integration, and dashboard work.
+### Job 1: Skilled Developer for AI Image Generation Software
+- **URL:** https://www.upwork.com/jobs/~022047861012140597205
+- **Budget:** Fixed price, $1,500
+- **Posted:** Posted 6 hours ago
+- **Proposals:** Less than 5
+- **Client:** United States, $2K+ spent, payment verified
+- **Description summary:** Client needs a developer to fix an AI image generation API with strict product/model consistency, correct view and color variants, faster generation, and lower cost per image.
+- **Why good fit:** Strong AI application debugging and API reliability fit.
 - **Priority:** High
 
-### Job 2: Chatbot and LLM Development Expert Needed
-- **URL:** https://www.upwork.com/jobs/~022047667085400713880
-- **Budget:** Fixed price, $50
-- **Posted:** 2 hours ago
-- **Proposals:** 20 to 50
-- **Client:** United States, 100% hire rate, $8.9K total spent
-- **Description summary:** Client wants a chatbot built with large language models, including conversational flow design, integration into platforms, and performance optimization. Client history is strong, but budget is very low and competition is high.
-- **Why good fit:** Clear chatbot/LLM fit, but economics and proposal count make it a low-value opportunity.
+### Job 2: Backend Hardening & Production Readiness
+- **URL:** https://www.upwork.com/jobs/~022047905597774494298
+- **Budget:** Hourly
+- **Posted:** Posted 3 hours ago
+- **Proposals:** 10 to 15
+- **Client:** Australia, $0 spent, payment verified
+- **Description summary:** Client has a locally hosted React, Vite, and Supabase app called Tarebook and needs backend hardening and production readiness. Skills include API, RESTful API, PostgreSQL, SQL, Node.js, Docker, Supabase, and React.
+- **Why good fit:** Good backend/API hardening fit with PostgreSQL and Docker overlap, but less LLM-specific.
 - **Priority:** Medium
 
-### Job 3: AI Platform Developer with Coding and Prompt Engineering Expertise
-- **URL:** https://www.upwork.com/nx/search/jobs/?q=LLM%20application%20development&sort=recency
-- **Budget:** Fixed price, $500
-- **Posted:** 25 minutes ago
+### Job 3: Full Stack + AI Systems Engineer (AI Operating System for Businesses)
+- **URL:** https://www.upwork.com/jobs/~022047764108483836057
+- **Budget:** Fixed price, $250
+- **Posted:** Posted 13 hours ago
 - **Proposals:** 5 to 10
-- **Client:** United States, payment verified, $0 spent
-- **Description summary:** Client needs help building and maintaining AI platforms/products with coding and prompt engineering. The visible listing is relevant but lacks client spend and hire history in the search result.
-- **Why good fit:** Relevant to AI product implementation and prompt engineering, but client history is weak.
+- **Client:** Pakistan, $2K+ spent, payment verified
+- **Description summary:** Client has an early AI operating system for businesses and wants to take it from functional to scalable. The system audits, diagnoses, and improves businesses automatically using existing codebase, workflows, and product direction.
+- **Why good fit:** Strong AI workflow/product systems fit, but listed budget is low.
 - **Priority:** Medium
 
-### Job 4: AI Engineer / Full-Stack Developer for Real-Time Medical Speech-to-Text + Clinical Notes App
-- **URL:** https://www.upwork.com/nx/search/jobs/?q=LLM%20application%20development&sort=recency
-- **Budget:** Hourly, $15.00-$35.00
-- **Posted:** 2 hours ago
-- **Proposals:** 50+
-- **Client:** USA, payment verified, $0 spent
-- **Description summary:** Client is building a healthcare app that generates clinical notes from doctor-patient conversations. Needs real-time or near-real-time speech-to-text, diarization, transcript quality improvements, and downstream AI note generation in a Node.js/Next.js/Vercel stack.
-- **Why good fit:** AI workflow and speech-to-text are relevant, but no client history and high competition reduce priority.
+### Job 4: Executive Operations & AI Integration Partner
+- **URL:** https://www.upwork.com/jobs/~022047827935587576472
+- **Budget:** Hourly, $3.00-$5.00
+- **Posted:** Posted 9 hours ago
+- **Proposals:** 5 to 10
+- **Client:** United States, $90K+ spent, payment verified
+- **Description summary:** C-level operator wants help reducing operational overhead: pulling data, organizing exports, prepping AI inputs, tracking follow-ups, and turning notes into systems. The work is strategic, data-heavy, and ongoing.
+- **Why good fit:** Good product-ops and AI workflow fit, but rate is far below target.
 - **Priority:** Low
 
 ## Search: Python MVP
 
-### Job 1: Build a Mobile App for Collecting Meter Data, Claude Code/Codex Engineer
-- **URL:** https://www.upwork.com/jobs/~022047655781715636844
-- **Budget:** Hourly, $15.00-$30.00
-- **Posted:** 3 hours ago
-- **Proposals:** Not visible in detail view
-- **Client:** United States, 58% hire rate, $137K total spent
-- **Description summary:** Client needs a mobile-first meter-reading MVP built with Claude Code or Codex. Core features include secure login, meter assignment, manual/photo capture with optional OCR, GPS/timestamps, offline sync, validation, and dashboard/export.
-- **Why good fit:** Excellent match for rapid MVP delivery, AI-assisted development workflow, backend/API design, dashboard/export, and product-focused execution.
+### Job 1: AI Automation and CRM Scraping Expert Needed on Make.com
+- **URL:** https://www.upwork.com/jobs/~022047768534590240921
+- **Budget:** Fixed price, $3,500
+- **Posted:** Posted 11 hours ago
+- **Proposals:** 20 to 50
+- **Client:** United States, $0 spent, payment verified
+- **Description summary:** Client wants a lightweight AI-enabled deal sourcing and CRM system that scrapes broker websites, email alerts, marketplaces, and manual submissions, then pushes structured opportunities into HubSpot with AI summaries, scoring, enrichment, follow-up tasks, and reporting.
+- **Why good fit:** Strong match for AI automation, data scraping, CRM workflow design, and MVP delivery.
 - **Priority:** High
 
-### Job 2: Full-Stack / Backend Developer (Russian Speaker Required)
-- **URL:** https://www.upwork.com/jobs/~022047668985589124049
-- **Budget:** Hourly, rate not listed in detail view
-- **Posted:** 2 hours ago
-- **Proposals:** 10 to 15
-- **Client:** United Arab Emirates, 26% hire rate, $6.9K total spent
-- **Description summary:** Client is launching a Russian-market product and needs an MVP built from scratch over two to four months. Work includes choosing stack/architecture, backend as main focus, frontend as needed, third-party APIs, and initial release preparation.
-- **Why good fit:** Good backend/MVP fit, but Russian speaker requirement and low average client hourly rate reduce match quality.
+### Job 2: Back-End Developer Needed for SaaS Mapping Tool (Node.js / Python)
+- **URL:** https://www.upwork.com/jobs/~022047884837110402001
+- **Budget:** Hourly, $30.00-$50.00
+- **Posted:** Posted 2 hours ago
+- **Proposals:** 20 to 50
+- **Client:** United States, $0 spent, payment verified
+- **Description summary:** Client is building a lightweight SaaS platform that converts property site plans into interactive digital maps. They need backend support for property data, unit data, file uploads, API connection to frontend, database setup, and a simple scalable MVP.
+- **Why good fit:** Good fit for Python backend, API design, database modeling, and lightweight MVP delivery.
 - **Priority:** Medium
 
-### Job 3: Senior Full-Stack Developer for Legal AI Platform (Next.js, PostgreSQL, LangGraph)
-- **URL:** https://www.upwork.com/nx/search/jobs/?q=Python%20MVP&sort=recency
-- **Budget:** Fixed price, $2,500
-- **Posted:** 2 hours ago
-- **Proposals:** 50+
-- **Client:** ARE, payment verified, $5K+ spent
-- **Description summary:** Client is building a legal AI platform with verification-first workflows, artifact generation, retrieval, PostgreSQL RLS, async jobs, LangGraph orchestration, audit logging, auth, and deployment foundations.
-- **Why good fit:** Very relevant to AI workflow, PostgreSQL, and backend systems, but competition is high and scope is broad.
+### Job 3: Full stack Engineer for AI SaaS MVP Development
+- **URL:** https://www.upwork.com/jobs/~022047697550609424341
+- **Budget:** Hourly
+- **Posted:** Posted 14 hours ago
+- **Proposals:** 5 to 10
+- **Client:** Pakistan, $0 spent, payment verified
+- **Description summary:** Client needs a full-stack engineer for AI SaaS MVP development. Visible requirements include Next.js, Node.js, CI/CD, Jira, AWS, Python, full-stack development, DevOps engineering, SaaS development, and AI platform work.
+- **Why good fit:** Relevant to rapid AI MVP delivery and backend/API workflow implementation.
 - **Priority:** Medium
+
+### Job 4: Full-Stack / Backend Developer (Russian Speaker Required)
+- **URL:** https://www.upwork.com/jobs/~022047668985589124049
+- **Budget:** Hourly
+- **Posted:** Posted yesterday
+- **Proposals:** 10 to 15
+- **Client:** United Arab Emirates, $6K+ spent, payment verified
+- **Description summary:** Client is launching a new Russian-market product and needs a developer to build an MVP from scratch, choose the tech stack and architecture, develop backend as the main focus, handle frontend if needed, integrate third-party APIs, and prepare the first release.
+- **Why good fit:** Good backend/MVP fit, but Russian speaker requirement is a major constraint.
+- **Priority:** Low
