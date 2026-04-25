@@ -8,3 +8,6 @@ test-results/
 __pycache__/
 *.pyc
 automation/upwork-browser/credentials.md
+automation/upwork-browser/screenshots/
+# Conversation exports (session logs)
+2026-*.md
