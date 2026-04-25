@@ -6,6 +6,10 @@ I read your job post carefully - [one sentence showing you understood their spec
 
 I've built similar solutions before: FastAPI backends integrated with OpenAI/Anthropic APIs, including RAG pipelines, structured data extraction, and streaming chat interfaces. You can see examples in my portfolio.
 
+Relevant examples:
+- RAG chatbot demo: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-rag-chatbot
+- FastAPI + LLM backend demo: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+
 Here's how I'd approach this:
 1. [Step 1 - scoped to their ask]
 2. [Step 2]

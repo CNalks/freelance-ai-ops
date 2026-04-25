@@ -33,8 +33,9 @@
 - [x] RAG chatbot demo project created
 - [x] FastAPI + LLM backend demo project created
 - [x] AI Ops Dashboard demo project created
-- [ ] Public dashboard URL verified
-- [ ] Backend demo deployment links added
+- [x] Dashboard published to `gh-pages` branch
+- [x] Public dashboard URL verified: https://cnalks.github.io/freelance-ai-ops/
+- [x] Backend demo GitHub/setup links added
 
 ## Pending
 

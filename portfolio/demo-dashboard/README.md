@@ -10,6 +10,11 @@ A static responsive dashboard for monitoring AI API usage, latency, token spend,
 
 Open `index.html` in a browser.
 
+## Public URL
+
+- Live demo: https://cnalks.github.io/freelance-ai-ops/
+- GitHub Pages source branch: https://github.com/CNalks/freelance-ai-ops/tree/gh-pages
+
 ## Tech
 
 - Tailwind CSS

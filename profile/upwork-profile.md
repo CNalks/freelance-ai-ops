@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | Name | Lin Zhijian |
-| Title | Full-Stack Python Developer \| FastAPI · AI Integration · LLM Applications |
+| Title | Full-Stack Python Developer \| FastAPI - AI Integration - LLM Applications |
 | Hourly Rate | $35/hr |
 
 ## Overview
@@ -29,12 +29,15 @@ I am a full-stack Python developer with a product manager background, so I focus
 
 ### RAG Chatbot
 
-Demo links coming soon
+- GitHub source and setup guide: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-rag-chatbot
+- Docker-ready FastAPI RAG demo with LangChain, OpenAI API, and local ChromaDB.
 
 ### FastAPI + LLM Backend
 
-Demo links coming soon
+- GitHub source and setup guide: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+- Docker-ready FastAPI backend demo with completions, SSE streaming, structured extraction, and summarization.
 
 ### AI Ops Dashboard
 
-Demo links coming soon
+- Live demo: https://cnalks.github.io/freelance-ai-ops/
+- GitHub Pages source: https://github.com/CNalks/freelance-ai-ops/tree/gh-pages

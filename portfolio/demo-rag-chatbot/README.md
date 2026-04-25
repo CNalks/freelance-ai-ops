@@ -60,6 +60,30 @@ services:
 docker compose up --build
 ```
 
+## Deployment
+
+This demo is Docker-ready and can be deployed to any Python/Docker host.
+
+Required environment variable:
+
+```bash
+OPENAI_API_KEY=sk-xxx
+```
+
+Suggested free-tier deployment path:
+
+1. Create a new Render or Railway service from this repository.
+2. Set the root directory to `portfolio/demo-rag-chatbot`.
+3. Configure `OPENAI_API_KEY` in the service environment.
+4. Mount persistent storage for `chroma_db` if document data should survive restarts.
+5. Use Docker build, or run:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+No public backend URL is committed until a cloud service and API key are configured.
+
 ## API Examples
 
 Ingest a text or PDF file:

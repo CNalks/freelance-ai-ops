@@ -10,6 +10,8 @@ My approach:
 3. Fix + add a test to prevent regression
 4. Document what was wrong and why
 
+Code examples: https://github.com/CNalks/freelance-ai-ops
+
 I'll keep you updated throughout. Turnaround is usually [X hours/days] for issues like this.
 
 Best,

@@ -6,6 +6,10 @@ Hi [Client Name],
 
 I specialize in rapid MVP delivery: FastAPI backend + Tailwind CSS frontend, deployed and production-ready. My PM background means I focus on what actually matters for launch - no overengineering.
 
+Relevant examples:
+- AI Ops dashboard live demo: https://cnalks.github.io/freelance-ai-ops/
+- FastAPI + LLM backend demo: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+
 Proposed approach:
 1. [Define scope together - 1 day]
 2. [Build core API + basic UI - X days]
