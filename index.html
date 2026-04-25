@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Ops Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sidebar: "#1e293b",
+            accent: "#3b82f6"
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-100 text-slate-900">
+  <div class="min-h-screen md:flex">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-72 -translate-x-full bg-sidebar text-white transition-transform duration-200 md:static md:translate-x-0">
+      <div class="flex h-16 items-center border-b border-white/10 px-6">
+        <div>
+          <p class="text-xs uppercase tracking-wide text-slate-300">AI Operations</p>
+          <h1 class="text-xl font-semibold">Ops Dashboard</h1>
+        </div>
+      </div>
+      <nav class="space-y-1 p-4">
+        <a class="flex min-h-11 items-center rounded-lg bg-accent px-4 text-sm font-medium text-white" href="#">Dashboard</a>
+        <a class="flex min-h-11 items-center rounded-lg px-4 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white" href="#">Models</a>
+        <a class="flex min-h-11 items-center rounded-lg px-4 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white" href="#">API Keys</a>
+        <a class="flex min-h-11 items-center rounded-lg px-4 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white" href="#">Settings</a>
+        <a class="flex min-h-11 items-center rounded-lg px-4 text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white" href="#">Docs</a>
+      </nav>
+    </aside>
+
+    <div id="overlay" class="fixed inset-0 z-20 hidden bg-slate-900/50 md:hidden"></div>
+
+    <main class="min-w-0 flex-1">
+      <header class="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 md:px-8">
+        <button id="menuButton" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-slate-200 text-slate-700 md:hidden" aria-label="Open navigation">
+          <span class="text-2xl leading-none">☰</span>
+        </button>
+        <div class="hidden md:block">
+          <h2 class="text-2xl font-semibold tracking-tight">Dashboard</h2>
+          <p class="text-sm text-slate-500">Realtime snapshot of AI service usage and reliability.</p>
+        </div>
+        <div class="flex min-h-11 items-center gap-3 rounded-full border border-slate-200 px-4 text-sm text-slate-600">
+          <span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+          Live
+        </div>
+      </header>
+
+      <section class="space-y-6 p-4 md:p-8">
+        <div class="md:hidden">
+          <h2 class="text-2xl font-semibold tracking-tight">Dashboard</h2>
+          <p class="text-sm text-slate-500">Realtime snapshot of AI service usage and reliability.</p>
+        </div>
+
+        <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <article class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">Total Requests</p>
+            <p class="mt-3 text-3xl font-semibold">124,892</p>
+            <p class="mt-2 text-sm text-emerald-600">+12.4% vs last week</p>
+          </article>
+          <article class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">Avg Latency</p>
+            <p class="mt-3 text-3xl font-semibold">342ms</p>
+            <p class="mt-2 text-sm text-emerald-600">-8.1% improvement</p>
+          </article>
+          <article class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">Token Usage</p>
+            <p class="mt-3 text-3xl font-semibold">2.1M</p>
+            <p class="mt-2 text-sm text-slate-500">Across 3 models</p>
+          </article>
+          <article class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-sm font-medium text-slate-500">Error Rate</p>
+            <p class="mt-3 text-3xl font-semibold">0.3%</p>
+            <p class="mt-2 text-sm text-emerald-600">Within SLA</p>
+          </article>
+        </section>
+
+        <section class="grid gap-6 xl:grid-cols-2">
+          <article class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <h3 class="text-lg font-semibold">Daily Request Volume</h3>
+                <p class="text-sm text-slate-500">Last 7 days</p>
+              </div>
+            </div>
+            <div class="h-72">
+              <canvas id="volumeChart"></canvas>
+            </div>
+          </article>
+          <article class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="mb-4">
+              <h3 class="text-lg font-semibold">Token Usage by Model</h3>
+              <p class="text-sm text-slate-500">Current billing period</p>
+            </div>
+            <div class="mx-auto h-72 max-w-md">
+              <canvas id="modelChart"></canvas>
+            </div>
+          </article>
+        </section>
+
+        <section class="rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div class="border-b border-slate-200 p-5">
+            <h3 class="text-lg font-semibold">Recent Activity</h3>
+            <p class="text-sm text-slate-500">Latest API calls across production endpoints.</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+              <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th class="px-5 py-3">Timestamp</th>
+                  <th class="px-5 py-3">Endpoint</th>
+                  <th class="px-5 py-3">Model</th>
+                  <th class="px-5 py-3">Tokens</th>
+                  <th class="px-5 py-3">Latency</th>
+                  <th class="px-5 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody id="activityBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const activity = [
+      ["10:42:18", "/chat", "gpt-4", "3,218", "384ms", "success"],
+      ["10:41:52", "/extract", "gpt-3.5-turbo", "872", "219ms", "success"],
+      ["10:40:33", "/summarize", "claude-3", "5,904", "612ms", "success"],
+      ["10:39:48", "/chat", "gpt-4", "2,441", "356ms", "success"],
+      ["10:38:25", "/classify", "gpt-3.5-turbo", "514", "188ms", "success"],
+      ["10:37:19", "/chat", "claude-3", "4,106", "529ms", "error"],
+      ["10:36:44", "/embed", "gpt-3.5-turbo", "1,248", "142ms", "success"],
+      ["10:35:30", "/extract", "gpt-4", "2,009", "401ms", "success"],
+      ["10:34:12", "/summarize", "claude-3", "6,771", "682ms", "success"],
+      ["10:33:51", "/chat", "gpt-4", "3,587", "390ms", "success"]
+    ];
+
+    const statusClass = {
+      success: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
+      error: "bg-rose-50 text-rose-700 ring-rose-600/20"
+    };
+
+    document.getElementById("activityBody").innerHTML = activity.map(([time, endpoint, model, tokens, latency, status]) => `
+      <tr class="hover:bg-slate-50">
+        <td class="whitespace-nowrap px-5 py-4 text-slate-600">${time}</td>
+        <td class="whitespace-nowrap px-5 py-4 font-medium">${endpoint}</td>
+        <td class="whitespace-nowrap px-5 py-4 text-slate-600">${model}</td>
+        <td class="whitespace-nowrap px-5 py-4 text-slate-600">${tokens}</td>
+        <td class="whitespace-nowrap px-5 py-4 text-slate-600">${latency}</td>
+        <td class="whitespace-nowrap px-5 py-4">
+          <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${statusClass[status]}">${status}</span>
+        </td>
+      </tr>
+    `).join("");
+
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: "#475569", font: { family: "ui-sans-serif" } } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: "#64748b" } },
+        y: { grid: { color: "#e2e8f0" }, ticks: { color: "#64748b" } }
+      }
+    };
+
+    new Chart(document.getElementById("volumeChart"), {
+      type: "bar",
+      data: {
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        datasets: [{
+          label: "Requests",
+          data: [14200, 16980, 18340, 17110, 20480, 18950, 22832],
+          backgroundColor: "#3b82f6",
+          borderRadius: 8
+        }]
+      },
+      options: chartOptions
+    });
+
+    new Chart(document.getElementById("modelChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["gpt-4", "gpt-3.5-turbo", "claude-3"],
+        datasets: [{
+          data: [46, 34, 20],
+          backgroundColor: ["#3b82f6", "#10b981", "#f59e0b"],
+          borderColor: "#ffffff",
+          borderWidth: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "62%",
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: "#475569", padding: 18 }
+          }
+        }
+      }
+    });
+
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    const menuButton = document.getElementById("menuButton");
+
+    function setMenu(open) {
+      sidebar.classList.toggle("-translate-x-full", !open);
+      overlay.classList.toggle("hidden", !open);
+    }
+
+    menuButton.addEventListener("click", () => setMenu(true));
+    overlay.addEventListener("click", () => setMenu(false));
+  </script>
+</body>
+</html>
