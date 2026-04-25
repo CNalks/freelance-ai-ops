@@ -1,125 +1,110 @@
-# Job Leads - 2026-04-25
+# Job Leads - 2026-04-26
 
 ## Daily Run Summary
 
-- Source: Upwork CDP scraper, logged-in Chrome at `127.0.0.1:9222`.
+- Source: Upwork Raw CDP, logged-in Chrome at `127.0.0.1:9222`.
 - Searches: FastAPI Python backend, OpenAI API integration, AI chatbot development, LLM application development, Python MVP.
-- Raw results: 50 scraped rows, 39 unique job IDs after same-run dedupe.
-- Already tracked/drafted jobs skipped: Full Stack Developer, AI Automation and CRM Scraping Expert Needed on Make.com.
-- Account check: Best Matches page loaded while logged in; Messages link visible; no clear unread notification or message count found. No messages sent.
+- Raw results: 50 scraped rows, 39 unique job IDs.
+- Deduplicated against tracker: 6 already tracked jobs skipped.
+- New jobs found: 33.
+- Notifications check: messages `0`; standard notifications selector `0`; visible nav hint showed `3 Notifications`.
+- No proposals submitted, no messages sent, no Connects purchase clicked.
 
 ## Top 5 Ready Leads
 
-### 1. AI Developer (Voice-First) | Build & Scale Lead Agent for UK Property Business
+### 1. SSL and service communication certificate | updating and automation script
 
-- URL: https://www.upwork.com/jobs/~022048053834859864725
-- Budget: $25-$65/hr
-- Posted: 16 minutes ago
-- Proposals: 10 to 15
-- Client: United Kingdom, $20K+ spent, payment verified
-- Summary: UK property business wants a voice-first AI lead agent for SpareRoom enquiries, WhatsApp follow-ups, outbound calls, property-manager chasing, and daily reporting.
-- Why good fit: Strong match for AI automation, API integration, conversational workflows, and practical MVP delivery.
-- Suggested rate: $35/hr
-- Priority: High
-
-### 2. IVR & Surveys
-
-- URL: https://www.upwork.com/jobs/~022048007551662912108
-- Budget: $150 fixed
-- Posted: 20 minutes ago
-- Proposals: Less than 5
-- Client: United States, $10K+ spent, payment verified
-- Summary: Build a Twilio SMS survey system that asks 3-5 questions, collects responses, and links answers to phone numbers or emails. Optional keypad-only IVR.
-- Why good fit: Focused backend automation job with Twilio, Python/API workflow, and a small deliverable suitable for a first review.
-- Suggested rate: $150 fixed
-- Priority: High
-
-### 3. Voter Sorting and Canvassing Project
-
-- URL: https://www.upwork.com/jobs/~022048015075917357717
+- URL: https://www.upwork.com/jobs/~022048072681828493976
 - Budget: $300 fixed
-- Posted: 2 hours ago
-- Proposals: 5 to 10
-- Client: United States, $10K+ spent, payment verified
-- Summary: Two-part project for voter data sorting and canvassing after sorting, using VPS/Render/OVHCloud/Twilio plus a mapping tool.
-- Why good fit: Direct match for Python/FastAPI, PostgreSQL/PostGIS, data cleaning, API development, and MVP backend delivery.
+- Posted: 8 minutes ago
+- Proposals: Less than 5
+- Client: Belgium, $10K+ spent, payment verified
+- Summary: Client needs SSL and service communication certificates updated across 6 systems/domains, then automated so the issue does not recur.
+- Why good fit: Practical Python/API automation with low competition, verified client, and clear first deliverable.
 - Suggested rate: $300 fixed
 - Priority: High
 
-### 4. React Developer - Port & Deploy a Trauma Healing Companion App
+### 2. AI Software Engineer & Delivery Expert
 
-- URL: https://www.upwork.com/jobs/~022047967345034382289
-- Budget: $35-$50/hr
-- Posted: 3 hours ago
-- Proposals: 10 to 15
-- Client: Switzerland, $0 spent, payment verified
-- Summary: Port an existing React JSX prototype into a deployable PWA with Anthropic API support, AI support chat, assessment flow, exercises, and healing plan builder.
-- Why good fit: Strong AI app and dashboard-style frontend match, but client has no Upwork spend history.
-- Suggested rate: $35/hr
-- Priority: Medium
+- URL: https://www.upwork.com/jobs/~022048071780701008492
+- Budget: $15-$30/hr
+- Posted: 12 minutes ago
+- Proposals: 5 to 10
+- Client: Nigeria, $1K+ spent, payment verified
+- Summary: Client needs an AI software engineer to support development of multiple products, platforms, and innovation projects.
+- Why good fit: Matches AI delivery, product execution, backend implementation, and clear communication positioning.
+- Suggested rate: $30/hr
+- Priority: High
 
-### 5. GeoFencing
-
-- URL: https://www.upwork.com/jobs/~022048003342220643281
-- Budget: $150 fixed
-- Posted: 3 hours ago
-- Proposals: 10 to 15
-- Client: United States, $10K+ spent, payment verified
-- Summary: Build an 8-day geofencing web app MVP that detects enter/exit events and sends SMS alerts through Twilio.
-- Why good fit: Small MVP with backend/API workflow, event logic, Twilio notification, and clear delivery scope.
-- Suggested rate: $150 fixed
-- Priority: Medium
-
-## Other Relevant New Leads
-
-### AI Voice & Avatar Developer for Real-Time Conversational Healthcare App
+### 3. AI Voice & Avatar Developer for Real-Time Conversational Healthcare App
 
 - URL: https://www.upwork.com/jobs/~022048018596377059989
 - Budget: $15,000 fixed
-- Posted: 1 hour ago
+- Posted: yesterday
 - Proposals: 20 to 50
 - Client: USA, $10K+ spent, payment verified
-- Note: Strong AI/voice fit and strong budget, but proposal count is high. Keep as a backup if Connects budget allows.
+- Summary: Touchscreen healthcare app with a human-like avatar, real-time voice interaction, and conversational AI.
+- Why good fit: Strong AI/voice/API integration fit and strong client budget, but high competition.
+- Suggested rate: $35/hr or paid discovery milestone
+- Priority: Medium
 
-### AI Software Engineering & Delivery Expert
+### 4. AI Assistant Development for WhatsApp
 
-- URL: https://www.upwork.com/jobs/~022048036578805342869
-- Budget: $25-$47/hr
-- Posted: 1 hour ago
+- URL: https://www.upwork.com/jobs/~022048042599670014613
+- Budget: $450 fixed
+- Posted: yesterday
+- Proposals: 20 to 50
+- Client: Thailand, $30K+ spent, payment verified
+- Summary: Build an AI assistant for WhatsApp with conversational AI, NLP, and API integration.
+- Why good fit: Direct fit for chatbot/API workflow, with credible client spend; proposal count is the main risk.
+- Suggested rate: $450 fixed
+- Priority: Medium
+
+### 5. AI Exam Check automation using OpenAI
+
+- URL: https://www.upwork.com/jobs/~022048009698611885831
+- Budget: $50 fixed
+- Posted: yesterday
 - Proposals: 15 to 20
-- Client: Nigeria, $1K+ spent, payment verified
-- Note: Good general AI delivery fit, but proposal count is already above the target threshold.
+- Client: GBR, $100 spent, payment verified
+- Summary: Existing AI exam-check automation needs work with Python, React, OpenAI/Azure OpenAI, Azure services, and Docker.
+- Why good fit: Small but relevant OpenAI/Python/Docker troubleshooting job that may be useful for first-review momentum.
+- Suggested rate: $50 fixed trial
+- Priority: Medium
 
-### AI Engineer (LLM / RAG / FastAPI) for EdTech Platform
+## Backup Leads
 
-- URL: https://www.upwork.com/jobs/~022047960926663963244
-- Budget: $1,500 fixed
-- Posted: 3 hours ago
-- Proposals: 20 to 50
-- Client: Ethiopia, $0 spent, payment verified
-- Note: Exact technical fit for LLM/RAG/FastAPI, but no client spend and high competition make it lower priority.
+### Build a Simple Web-Based AI Chat MVP
 
-### Backend Hardening & Production Readiness
+- URL: https://www.upwork.com/jobs/~022048023008463923864
+- Budget: $15-$35/hr
+- Posted: 27 minutes ago
+- Proposals: 5 to 10
+- Client: Austria, $0 spent, payment unverified
+- Note: Excellent portfolio fit for AI chat plus dashboard, but skipped from top 5 because the client has no spend and payment is unverified.
 
-- URL: https://www.upwork.com/jobs/~022047905597774494298
-- Budget: Hourly
-- Posted: 10 hours ago
-- Proposals: 10 to 15
-- Client: Australia, $0 spent, payment verified
-- Note: Relevant to backend hardening and production readiness, but less aligned with the AI portfolio positioning.
+### Full-Stack Developer (AI + WordPress Automation Bot)
 
-### Back-End Developer Needed for SaaS Mapping Tool
+- URL: https://www.upwork.com/jobs/~022048012372405234328
+- Budget: $200 fixed
+- Posted: yesterday
+- Proposals: 15 to 20
+- Client: USA, $300+ spent, payment verified
+- Note: Relevant AI API automation, but WordPress/PHP is not the core positioning and competition is above target.
 
-- URL: https://www.upwork.com/jobs/~022047884837110402001
-- Budget: $30-$50/hr
-- Posted: 8 hours ago
-- Proposals: 20 to 50
-- Client: United States, $0 spent, payment verified
-- Note: Good backend/SaaS fit, but no client spend and high proposal count.
+### Bubble.io Expert Needed for MVP Audit + OpenAI Chat Integration
+
+- URL: https://www.upwork.com/jobs/~022048060515054319367
+- Budget: $700 fixed
+- Posted: 48 minutes ago
+- Proposals: 5 to 10
+- Client: United States, $0 spent, payment unverified
+- Note: Good OpenAI concept but no-code/Bubble is not the strongest fit and client history is weak.
 
 ## Filtered Out
 
-- Jobs under $30 fixed or under $5/hr were skipped.
-- Jobs with 50+ proposals were skipped unless kept only as a backup note.
-- Jobs with no client spend and weak fit were skipped.
-- Previously drafted or tracked jobs were skipped.
+- Already tracked jobs were removed before scoring.
+- Jobs under `$30` fixed or below `$5/hr` were skipped.
+- Jobs with `50+` proposals were skipped.
+- Jobs with `$0 spent` plus weak or unverified client history were skipped unless kept as a backup note.
+- Mobile-only, WordPress-heavy, Odoo-specific, and unrelated QA/CV/embedded jobs were deprioritized.

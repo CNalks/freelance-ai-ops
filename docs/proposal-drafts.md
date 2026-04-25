@@ -1,116 +1,104 @@
-# Proposal Drafts - 2026-04-25
+# Proposal Drafts - 2026-04-26
 
-## Job: AI Developer (Voice-First) | Build & Scale Lead Agent for UK Property Business
-
-URL: https://www.upwork.com/jobs/~022048053834859864725
-
-### Cover Letter
-
-Your workflow is a strong fit for an AI operations agent: inbound SpareRoom leads, WhatsApp follow-ups, outbound calls, reminders, and daily reporting all need one reliable process instead of scattered tools.
-
-I build Python/FastAPI backends and AI/LLM integrations with a product-manager mindset, so I would start by mapping the lead lifecycle, then ship a focused MVP: lead intake, state tracking, scripted follow-up logic, API/webhook integrations, and clear reporting.
-
-Relevant demos:
-- FastAPI + LLM backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
-- RAG chatbot backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-rag-chatbot
-
-My suggested first milestone is one working lead flow before expanding to calls and reporting.
-
-What channel should the first MVP automate: SpareRoom, WhatsApp, or outbound calls?
-
-### Suggested Rate
-
-$35/hr
-
----
-
-## Job: IVR & Surveys
-
-URL: https://www.upwork.com/jobs/~022048007551662912108
+## Job: SSL and service communication certificate | updating and automation script
+**URL:** https://www.upwork.com/jobs/~022048072681828493976
 
 ### Cover Letter
 
-I can build the Twilio SMS survey as a small backend MVP: upload/import contacts, send the first SMS, track each recipient's current question, save answers, and export the response data linked to phone number or email.
+You mentioned two critical certificate layers across 6 systems/domains, and the important part is not only updating them once but making the renewal/update process repeatable.
 
-My background is Python/FastAPI backend work, API integrations, and documented MVP delivery. For this project I would keep the system simple: Twilio webhook endpoints, a lightweight database model, clear survey state handling, and basic logs so the flow is easy to test and maintain.
+I can help with a focused approach: first audit the current SSL and service communication certificate status, then update the affected domains/services, then add a Python automation script with clear logs and documented renewal steps. My background is Python backend/API automation, so I will keep the work practical and easy to maintain.
 
-I can also include keypad-only IVR as a separate milestone if SMS is working first.
+Timeline estimate: 1-2 days if access and certificate details are available.
 
-Relevant backend demo:
-https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
-
-Can you confirm whether the first version needs an admin upload screen, or is a CSV file import enough?
+Which hosting/control panel or cloud provider manages the 6 domains today?
 
 ### Suggested Rate
-
-$150 fixed
-
----
-
-## Job: Voter Sorting and Canvassing Project
-
-URL: https://www.upwork.com/jobs/~022048015075917357717
-
-### Cover Letter
-
-This looks like two practical deliverables: clean and sort the voter data first, then make the canvassing workflow usable with mapping and outreach data.
-
-I can help build the Python/FastAPI backend, PostgreSQL/PostGIS data model, CSV/TXT import flow, cleaning rules, and API endpoints needed for canvassing. I would start by defining the exact sort criteria, then produce a working import/sort/export milestone before adding map or Twilio functionality.
-
-My strength is shipping focused MVP backends with clear documentation, so you can inspect the data flow and extend it later.
-
-Relevant demos:
-- FastAPI + LLM backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
-- Dashboard UI: https://cnalks.github.io/freelance-ai-ops/
-
-What source format will the voter data arrive in: CSV, TXT, or another database export?
-
-### Suggested Rate
-
 $300 fixed
 
 ---
 
-## Job: React Developer - Port & Deploy a Trauma Healing Companion App
-
-URL: https://www.upwork.com/jobs/~022047967345034382289
+## Job: AI Software Engineer & Delivery Expert
+**URL:** https://www.upwork.com/jobs/~022048071780701008492
 
 ### Cover Letter
 
-You already have the valuable part: a working prototype and a clear product concept. The job now is to turn it into a maintainable deployed PWA without losing the existing flow.
+Your post sounds like you need someone who can move AI product work forward, not just write isolated code. That fits my background: I combine product management thinking with Python/FastAPI backend work and AI/LLM integrations.
 
-I can help port the React JSX prototype, clean up the structure, connect Anthropic API for the support chat, and deploy the app on Vercel. My background combines product management and full-stack delivery, so I will keep the assessment, exercises, AI chat, and 3-month plan builder aligned with the reader journey rather than only moving code around.
+For a first milestone, I would help you define the highest-value product slice, map the API/data flow, then implement and document a working backend or AI feature. I can also support delivery coordination so requirements, technical decisions, and progress are clear.
 
-Relevant dashboard demo:
-https://cnalks.github.io/freelance-ai-ops/
+Relevant examples:
+- FastAPI + LLM backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+- RAG chatbot: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-rag-chatbot
 
-AI backend examples:
-https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+Timeline estimate: 3-5 days for the first scoped feature.
 
-Is the current prototype using browser-only state, or does it already persist user progress anywhere?
+Which product or platform needs delivery support first?
 
 ### Suggested Rate
-
-$35/hr
+$30/hr
 
 ---
 
-## Job: GeoFencing
-
-URL: https://www.upwork.com/jobs/~022048003342220643281
+## Job: AI Voice & Avatar Developer for Real-Time Conversational Healthcare App
+**URL:** https://www.upwork.com/jobs/~022048018596377059989
 
 ### Cover Letter
 
-I can build this as a focused 8-day MVP: define geofence areas, receive location updates, detect enter/exit events, and send Twilio SMS alerts when the event rules are triggered.
+Your project has several moving parts: kiosk-style web UI, real-time voice interaction, avatar output, and healthcare conversation logic. I would not start by overbuilding. I would first ship a narrow prototype that proves the conversation loop works end to end.
 
-For a first version, I would keep the backend simple and testable: Python/FastAPI API endpoints, a small persistence layer for users and geofence definitions, event logic for inside/outside transitions, and clear setup notes for Render or VPS deployment.
+My approach would be: define the first healthcare use case, build a FastAPI backend for session/state handling, integrate the voice/LLM provider, then connect the web interface and document the architecture for the next avatar layer.
 
-My portfolio includes backend MVP and dashboard examples:
-- FastAPI + LLM backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
-- Dashboard UI: https://cnalks.github.io/freelance-ai-ops/
+Relevant AI backend demos:
+- FastAPI + LLM: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+- RAG chatbot: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-rag-chatbot
 
-Before estimating the final implementation detail, I would confirm one point: will location updates come from a mobile app, browser GPS, or another tracking source?
+Timeline estimate: 1 week for a focused technical prototype.
+
+Which voice/avatar providers are you considering now?
 
 ### Suggested Rate
+$35/hr or paid discovery milestone
 
-$150 fixed
+---
+
+## Job: AI Assistant Development for WhatsApp
+**URL:** https://www.upwork.com/jobs/~022048042599670014613
+
+### Cover Letter
+
+An AI assistant for WhatsApp needs reliable conversation handling more than a generic chatbot demo. The key pieces are message intake, user state, intent handling, API integration, and clear fallback behavior.
+
+I can build this as a simple MVP: connect the WhatsApp messaging layer, create the backend conversation workflow, integrate the LLM/NLP logic, then add logs and documentation so the system can be tested and improved. My strongest stack is Python/FastAPI plus AI API integration.
+
+Relevant demos:
+- FastAPI + LLM backend: https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+- Dashboard example: https://cnalks.github.io/freelance-ai-ops/
+
+Timeline estimate: 3-5 days for a first working version.
+
+Will this use WhatsApp Business Cloud API or another provider?
+
+### Suggested Rate
+$450 fixed
+
+---
+
+## Job: AI Exam Check automation using OpenAI
+**URL:** https://www.upwork.com/jobs/~022048009698611885831
+
+### Cover Letter
+
+You already have an AI Exam Check automation project, so I would focus on diagnosing and improving the existing flow instead of rebuilding it from scratch.
+
+I can review the Python/OpenAI or Azure OpenAI integration, reproduce the current issue, tighten the API logic, then verify deployment assumptions with Docker. If React is involved, I can also check the frontend/backend contract so the automation returns consistent results to the user interface.
+
+Relevant backend demo:
+https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm
+
+Timeline estimate: 1 day for an initial diagnosis and focused fix if the current codebase is accessible.
+
+What is failing right now: scoring accuracy, API errors, deployment, or frontend result display?
+
+### Suggested Rate
+$50 fixed trial

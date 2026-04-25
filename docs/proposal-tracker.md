@@ -12,3 +12,8 @@
 | 2026-04-25 | Voter Sorting and Canvassing Project | https://www.upwork.com/jobs/~022048015075917357717 | Ready to submit | $300 fixed | Cover letter in proposal-drafts.md |
 | 2026-04-25 | React Developer - Port & Deploy a Trauma Healing Companion App | https://www.upwork.com/jobs/~022047967345034382289 | Ready to submit | $35/hr | Cover letter in proposal-drafts.md |
 | 2026-04-25 | GeoFencing | https://www.upwork.com/jobs/~022048003342220643281 | Ready to submit | $150 fixed | Cover letter in proposal-drafts.md |
+| 2026-04-26 | SSL and service communication certificate - updating and automation script | https://www.upwork.com/jobs/~022048072681828493976 | Ready to submit | $300 fixed | Cover letter in proposal-drafts.md |
+| 2026-04-26 | AI Software Engineer & Delivery Expert | https://www.upwork.com/jobs/~022048071780701008492 | Ready to submit | $30/hr | Cover letter in proposal-drafts.md |
+| 2026-04-26 | AI Voice & Avatar Developer for Real-Time Conversational Healthcare App | https://www.upwork.com/jobs/~022048018596377059989 | Ready to submit | $35/hr or paid discovery milestone | Cover letter in proposal-drafts.md |
+| 2026-04-26 | AI Assistant Development for WhatsApp | https://www.upwork.com/jobs/~022048042599670014613 | Ready to submit | $450 fixed | Cover letter in proposal-drafts.md |
+| 2026-04-26 | AI Exam Check automation using OpenAI | https://www.upwork.com/jobs/~022048009698611885831 | Ready to submit | $50 fixed trial | Cover letter in proposal-drafts.md |
