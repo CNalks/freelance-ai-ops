@@ -37,9 +37,32 @@
 - [x] Public dashboard URL verified: https://cnalks.github.io/freelance-ai-ops/
 - [x] Backend demo GitHub/setup links added
 
-## Pending
+## Full Business Architecture (2026-04-26)
 
-- [ ] Submit first proposals on Upwork
-- [ ] Get first client response
-- [ ] Land first contract
-- [ ] Create first client project folder under `projects/`
+- [x] Task 1: Find Jobs — 搜索 + 筛选 + 草拟 proposal
+- [x] Task 2: Apply Jobs — CDP 填表单
+- [x] Task 3: Monitor Bids — 检查已投 proposal 竞价状态
+- [x] Task 4: Client Comms — 检查消息 + 草拟回复
+- [x] Task 5: Analytics — 数据采集 + 转化分析
+- [x] Task 6: Optimize — Profile / 定价 / 策略优化
+- [x] CDP Utils — 共享工具函数 (`docs/cdp-utils.md`)
+- [x] Codex Automations — 自动化 prompt (`docs/codex-automations.md`)
+- [x] Old task files archived to `task/archive/`
+
+## Upwork Account
+
+- [x] Freelancer Plus plan purchased (100 Connects/month)
+- [ ] First proposals submitted
+- [ ] First client response
+- [ ] First contract landed
+- [ ] 5 strong reviews collected
+- [ ] Rate raised to $50/hr
+
+## Milestones
+
+| Date | Milestone |
+|------|-----------|
+| 2026-04-24 | Repo created, profile drafted, first job search |
+| 2026-04-25 | CDP scraper working, 10 proposals drafted, demos deployed |
+| 2026-04-25 | Freelancer Plus purchased |
+| 2026-04-26 | Full 6-task business architecture completed |

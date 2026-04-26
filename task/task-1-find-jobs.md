@@ -24,6 +24,10 @@ State files (read before starting):
 - **DO NOT use Windows MCP** — too expensive
 - **DO NOT submit proposals, send messages, or click purchase buttons**
 
+## CDP 工具函数
+
+完整的 CDP 工具函数（CDPSession class, navigate, evaluate, check_login, check_notifications, fill_input）在 `docs/cdp-utils.md` 中。所有 task 共用同一套工具代码。
+
 ## CDP Quick Reference
 
 ```python

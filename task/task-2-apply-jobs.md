@@ -29,6 +29,10 @@ Input files (written by Task 1):
 - **DO NOT use Playwright** — Cloudflare detects it
 - **DO NOT use Windows MCP** — too expensive
 
+## CDP 工具函数
+
+完整的 CDP 工具函数（CDPSession class, navigate, evaluate, check_login, fill_input 等）在 `docs/cdp-utils.md` 中。所有 task 共用同一套工具代码。
+
 ## CDP Quick Reference
 
 ```python
