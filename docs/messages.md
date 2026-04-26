@@ -4,7 +4,7 @@
 
 - Unread message threads: 0
 - Client conversations detected: 0
-- Notifications checked: visible page text only
+- Notifications checked: 0 visible items
 - Draft replies written: 0
 
 ## Priority Breakdown
@@ -17,7 +17,7 @@
 
 | Type | Summary | Action Needed |
 |------|---------|---------------|
-| None | No client messages, interview invitations, or contract offers detected | No reply needed |
+| None | No visible notifications detected | No reply needed |
 
 ## Pending Replies
 
