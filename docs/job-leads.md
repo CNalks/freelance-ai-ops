@@ -4,26 +4,39 @@
 
 - Source: Upwork Raw CDP, logged-in Chrome at `127.0.0.1:9222`.
 - Searches: FastAPI Python backend, OpenAI API integration, AI chatbot development, LLM application development, Python MVP.
-- Raw results: 50 scraped rows.
-- Deduplicated against tracker: 23 already tracked/duplicate jobs skipped.
-- New jobs found: 27 unique jobs.
+- Raw results: 40 scraped rows.
+- Deduplicated against tracker: 14 already tracked/duplicate jobs skipped.
+- New jobs found: 26 unique jobs.
 - AI reviewed: 10 candidates with full/visible job text.
-- Selected for proposal: 1.
+- Selected for proposal: 2.
 - Notifications check: messages `0`; notifications `0`.
-- No proposals submitted, no messages sent, no Connects purchase clicked.
+- No proposals submitted, no messages sent, no Connects purchase clicked during Task 1.
 
-## Selected Lead
+## Selected Leads
 
-### Backend Developer (Python / FastAPI) - Admin Panel for Flutter App LGBTQ+ Social Dating App
+### Project #2: Build AI-Powered Operating System for Construction Business (4 Agents, MVP to Scale)
 
-- URL: https://www.upwork.com/jobs/span-class-highlight-Backend-span-Developer-span-class-highlight-Python-span-span-class-highlight-FastAPI-span-Admin-Panel-for-Flutter-App-LGBTQ-Social-Dating-App_~022048388887259723929/?referrer_url_path=%2Fnx%2Fsearch%2Fjobs%2F
-- Budget: $10-$25/hr
-- Posted: 12 minutes ago when reviewed
-- Proposals: 5 to 10
-- Client: Portugal, $10K+ spent, payment verified
+- URL: https://www.upwork.com/jobs/Project-Build-Powered-Operating-System-for-Construction-Business-Agents-MVP-Scale_~022048396069381974680/?referrer_url_path=/nx/search/jobs/
+- Budget: Fixed price, visible on form.
+- Posted: Posted 23 minutes ago when reviewed.
+- Proposals: 10 to 15.
+- Client: GBR, $100+ spent, payment verified.
 - Decision: APPLY
-- Reasoning: The visible work is backend-focused: FastAPI admin APIs, PostgreSQL, Redis, JWT/RBAC, WebSocket updates, moderation workflows, payments/subscriptions records, analytics, and AI-ready architecture. Although the product is a Flutter app and the rate ceiling is lower than ideal, the scope is clear enough for a focused first milestone and could produce a useful first review.
-- Proposal angle: Lead with secure FastAPI admin workflows and realtime moderation infrastructure.
+- Reasoning: Strong AI-agent workflow fit with a concrete vertical (construction operations) and enough specificity to pitch a first MVP slice. Risk is medium because "OS with 4 agents" can sprawl, so the proposal should push toward one scoped workflow first.
+- Proposal angle: Lead with the need to validate one agent workflow before scaling to the full operating system.
+- Risk level: Medium
+- Expected Connects cost: visible on apply form, not recorded in docs.
+
+### Claude Code AI Agents for CRM
+
+- URL: https://www.upwork.com/jobs/Claude-Code-span-class-highlight-span-Agents-for-CRM_~022048437550743419482/?referrer_url_path=/nx/search/jobs/
+- Budget: $15-$35/hr.
+- Posted: Posted 37 minutes ago when reviewed.
+- Proposals: Less than 5.
+- Client: India, $0 spent, payment verified.
+- Decision: APPLY
+- Reasoning: Direct fit for CRM automation, AI agents, Python, pipeline reporting, and lead follow-up workflows, with very low current competition. Risk is medium because the client has no Upwork spend, but payment is verified and the hourly ceiling supports the profile rate.
+- Proposal angle: Lead with reliable CRM workflow automation and auditability, not a generic agent demo.
 - Risk level: Medium
 - Expected Connects cost: visible on apply form, not recorded in docs.
 
@@ -31,19 +44,9 @@
 
 | Job | Reason |
 |-----|--------|
-| Technical Customer Representative (Ex-CTO / Tech Lead / Software Engineer) | $0 client spend and customer-facing/in-person consulting, not a focused backend/AI build. |
-| Setup n8n "Command Center" - Connect my Google Drive to GPT-5.5 Chat | 20-50 proposals, no-code preference, and low hourly ceiling. |
-| Business Analyst / Product Owner (AI-Powered Social Media CRM) | 20-50 proposals and product-owner/documentation role rather than implementation. |
-| AI Server Setup: RunPod + vLLM API + Nginx + Grafana Dashboard | $0 client spend and narrow MLOps/GPU setup risk. |
-| AI / Agentic Engineer | $0 client spend, long ambiguous founding-engineer scope. |
-| Senior ML Engineer for AI Categorization | 20-50 proposals; good technical fit but too competitive for this account today. |
-| Software Developer for API Integration Project (OpenAI) | $10 fixed budget and 20-50 proposals. |
-| Senior Full-Stack Developer | Spanish fluency and active Claude Max requirements, plus low $5-$20/hr range. |
-| Backend Developer (Node.js / Python) - GPS Data Processing & Rules Engine | $0 spend/payment not shown and non-English domain-specific requirements. |
-
-## Task 2 Result
-
-- The selected FastAPI backend proposal was pre-filled through Raw CDP.
-- Cover letter length filled: 781 chars.
-- Hourly rate filled: `$25.00`.
-- Final Submit/Send Proposal was not clicked.
+| Build MEDIPOCKET OS (No-Code Dashboard + CRM + Automations + KPI Reporting) | No-code dashboard/CRM request with $100 fixed budget; weak fit for FastAPI/AI backend positioning. |
+| Senior Quant Developer - Build Automated Stock Trading System (IBKR API) | Python/API overlap exists, but trading-system domain risk and long-running finance scope make it poor first-review work. |
+| Technical Customer Representative (Ex-CTO / Tech Lead / Software Engineer) | Customer-facing/in-person representative role, not a focused implementation project. |
+| LLM Agent Expert (AI Systems & Automation) | Vague AI systems scope and not enough evidence of a small first milestone. |
+| Full-Stack Team Needed, Deterministic Content Production Platform (No AI Randomness) | Budget is below the minimum practical threshold. |
+| ML Engineering Agency for LLM Fine-Tuning | Budget is below the minimum practical threshold. |
