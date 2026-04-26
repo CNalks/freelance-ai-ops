@@ -1,35 +1,41 @@
 # Bid Monitoring Report - 2026-04-27
 
-## Active Proposals: 0
+## Active Proposals: 7
 ## Interviews: 0
 ## Closed/Lost: 0
 
 ## Upwork Proposal Page Check
 
 - Raw CDP check completed at https://www.upwork.com/nx/proposals/.
-- Pre-filled proposals awaiting manual Submit: 15
-- Ready but not pre-filled proposals: 0
-- No irreversible actions were clicked.
+- Submitted proposals checked from tracker: 7
+- Proposal tiles visible on page: 0
+- No submit, withdraw, purchase, or messaging actions were clicked.
 
 ### Needs Attention
 
 | Job | Status | Change | Recommended Action |
 |-----|--------|--------|--------------------|
-| Pre-filled proposal forms | Waiting for user review | 15 forms may be ready in Chrome | User reviews forms and manually clicks Submit if desired |
+| AI Assistant Development for WhatsApp | Active | unknown; Last viewed by client: | Monitor for reply |
+| OpenClaw Setup | Active | unknown; Last viewed by client: | Monitor for reply |
 
 ### Still Active
 
-| Job | Proposals When Applied | Proposals Now | Client Activity |
-|-----|------------------------|---------------|-----------------|
-| Not available from automation | N/A | See Upwork proposals page | No submitted proposals were created by this run |
+| Job | Proposals Now | Client Activity |
+|-----|---------------|-----------------|
+| Voter Sorting and Canvassing Project | unknown | unknown |
+| AI Software Engineer & Delivery Expert | unknown | unknown |
+| AI Assistant Development for WhatsApp | unknown | Last viewed by client: |
+| AI Exam Check automation using OpenAI | unknown | unknown |
+| Agentic AI set up | unknown | unknown |
+| Microsoft 365 Copilot & Azure AI Search Expert Needed | unknown | unknown |
+| OpenClaw Setup | unknown | Last viewed by client: |
 
 ### Closed/Archived
 
 | Job | Outcome | Notes |
 |-----|---------|-------|
-| Not detected | N/A | CDP did not identify a specific closed submitted proposal |
+| None | N/A | No closed submitted proposal detected |
 
 ## Recommended Actions
 
-- Review pre-filled proposal tabs manually before submitting.
-- If Upwork shows Connects warnings, decide manually; automation did not click Buy Connects.
+- No interviews detected by the proposal page selectors.
