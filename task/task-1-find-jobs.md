@@ -103,29 +103,104 @@ Extract job data via `Runtime.evaluate` on the DOM. For each job, capture: title
 Read `docs/proposal-tracker.md`. Remove any jobs whose URL already appears in the tracker.
 Keep only genuinely new jobs.
 
-## Step 3: Score and Select Top 5
+## Step 3: Initial Score and Filter
 
-Scoring criteria (in priority order):
+Apply hard filters to eliminate obvious mismatches:
 
+**Skip** jobs where:
+- Budget < $5/hr or < $30 fixed
+- Client has $0 spent AND no hire history
+- 50+ proposals already
+- Requires skills we don't have (mobile-only, blockchain, specific CMS, Angular/Vue-only)
+
+From the remaining jobs, rank by these signals:
 1. **Payment verified + client has spent money** (most important)
 2. **Proposals < 15** (less competition)
 3. **Posted < 12 hours ago** (freshness)
 4. **Budget aligns with pricing** (see `docs/pricing.md`)
 5. **Skills match**: FastAPI, Python, OpenAI/LLM, AI automation, MVP
 
-**Skip** jobs where:
-- Budget < $5/hr or < $30 fixed
-- Client has $0 spent AND no hire history
-- 50+ proposals already
-- Requires skills we don't have (mobile-only, blockchain, specific CMS)
+Take the **top 10 candidates** forward to the AI review step.
 
-## Step 4: Draft Proposals
+## Step 4: AI Strategic Review （重要 — 发挥 AI 判断力）
 
-Overwrite `docs/proposal-drafts.md` with today's drafts. For each selected job:
+This is the step where you (Claude/Codex) do what you're best at — **strategic thinking, not mechanical filtering**.
+
+For each of the top 10 candidates, read the full job description via CDP:
+
+```python
+for job in top_10:
+    await navigate(job["url"])
+    await asyncio.sleep(3)
+    full_description = await evaluate("document.body.innerText.slice(0, 5000)")
+    job["full_text"] = full_description
+```
+
+Then conduct a structured analysis. For each job, evaluate:
+
+### 4a. Strategic Fit Assessment
+
+Think through these questions (write your reasoning in `docs/job-leads.md`):
+
+- **Win probability**: Given our profile (new account, 0 reviews, AI/FastAPI focus), how likely are we to win this one? Be honest.
+- **Review potential**: If we win, will this lead to a strong 5-star review we can showcase? Or is the client likely to be difficult?
+- **Portfolio value**: Does completing this project give us a new portfolio piece or case study that opens doors to better jobs?
+- **Scope clarity**: Is the scope well-defined enough to deliver on time, or is it vague and likely to scope-creep?
+- **Rate sustainability**: Can we deliver quality work at the proposed rate without burning out?
+
+### 4b. Red Flag Detection
+
+Check for these warning signs:
+
+- **Vague scope + fixed price** → high risk of scope creep and disputes
+- **"Need it ASAP" + low budget** → unrealistic expectations
+- **Client has many hires but low avg review given** → difficult client
+- **Mentions "just a small task" but description is complex** → underestimating work
+- **Requires proprietary platform knowledge** (Salesforce, SAP, specific CRM) we don't have
+- **Asks for "ongoing" work but budget is one-time** → mismatch
+- **Multiple past freelancers hired and fired for same project** → project is problematic
+
+### 4c. Proposal Angle Strategy
+
+For jobs that pass the red flag check, determine:
+
+- **What hook should the cover letter open with?** — What specific pain point from the job post should we address first?
+- **Which portfolio piece to showcase?** — Match the most relevant demo (RAG chatbot for chatbot jobs, FastAPI LLM for API jobs, Dashboard for data/admin jobs)
+- **What's our competitive edge on this specific job?** — Why would the client pick us over the 10-20 other applicants?
+- **What clarifying question will show domain expertise?** — Not a generic question, but one that demonstrates we understand the problem
+
+### 4d. Final Selection
+
+From the 10 candidates, select **the top 5** (or fewer if quality is low):
+
+Write a brief decision for each in `docs/job-leads.md`:
+
+```markdown
+### [Job Title]
+**Decision:** APPLY / SKIP
+**Reasoning:** [2-3 sentences explaining why — be specific, not generic]
+**Proposal angle:** [1 sentence — the hook]
+**Risk level:** Low / Medium / High
+**Expected Connects cost:** [if visible]
+```
+
+**Selection principles:**
+- Prefer jobs where we have a genuine edge (not just "I can do this")
+- Prefer smaller scope with clear deliverables over ambiguous large projects
+- For a new account: prioritize jobs where we can deliver fast and get a review
+- If unsure between two jobs, pick the one with fewer proposals
+- It's better to send 3 strong proposals than 5 mediocre ones
+
+## Step 5: Draft Proposals
+
+Overwrite `docs/proposal-drafts.md` with today's drafts. **Only for jobs marked APPLY in Step 4.**
+
+For each selected job:
 
 ```markdown
 ## Job: [Title]
 **URL:** [url]
+**AI Review:** [1-line summary of why we're applying]
 
 ### Cover Letter
 
@@ -134,32 +209,40 @@ Overwrite `docs/proposal-drafts.md` with today's drafts. For each selected job:
 ### Suggested Rate
 [rate]
 
+### Proposal Strategy Notes
+- Hook: [what specific pain point we're addressing]
+- Demo to link: [which portfolio piece]
+- Clarifying question: [the expert question we're ending with]
+- Risk: [Low/Medium/High and why]
+
 ---
 ```
 
 Proposal rules:
 - Under 200 words
+- **Open with the specific hook identified in Step 4** — not a generic intro
 - Reference something specific from the job post (not generic)
 - Connect to our FastAPI/AI/LLM skills
 - Include 2-3 concrete steps of proposed approach
 - Include timeline estimate
-- End with a clarifying question
+- End with the clarifying question from Step 4 (shows domain expertise)
 - Tone: professional but conversational, not salesy
+- **Do NOT start with "I" or "Hi"** — start with a statement about THEIR problem
 
 Portfolio links to include where relevant:
 - Dashboard: `https://cnalks.github.io/freelance-ai-ops/`
 - FastAPI LLM: `https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-fastapi-llm`
 - RAG Chatbot: `https://github.com/CNalks/freelance-ai-ops/tree/main/portfolio/demo-rag-chatbot`
 
-## Step 5: Update Tracker
+## Step 6: Update Tracker
 
-Append new rows to `docs/proposal-tracker.md`:
+Append new rows to `docs/proposal-tracker.md` **only for APPLY jobs**:
 
 ```markdown
-| [date] | [title] | [url] | Ready to submit | [rate] | Cover letter in proposal-drafts.md |
+| [date] | [title] | [url] | Ready to submit | [rate] | [AI review 1-liner] |
 ```
 
-## Step 6: Check Notifications
+## Step 7: Check Notifications
 
 Navigate to `https://www.upwork.com/nx/find-work/best-matches` via CDP.
 
@@ -174,7 +257,7 @@ notifications = await evaluate("""
 
 Report any unread messages/notifications.
 
-## Step 7: Git
+## Step 8: Git
 
 ```bash
 git add docs/job-leads.md docs/proposal-drafts.md docs/proposal-tracker.md
@@ -188,7 +271,9 @@ git push origin main
 === Job Search Summary [date] ===
 New jobs found: X
 Deduplicated (already tracked): Y
-Top proposals drafted: Z
+AI reviewed: Z candidates
+Selected for proposal: W (with reasoning)
+Skipped with reason: [list of skipped jobs and why]
 Client messages/notifications: [count]
 Next step: Run Task 2 (apply-jobs) to pre-fill proposal forms
 ```
@@ -200,3 +285,5 @@ Next step: Run Task 2 (apply-jobs) to pre-fill proposal forms
 - Use Raw CDP only (no Playwright, no Windows MCP)
 - Keep proposals under 200 words
 - Always deduplicate against proposal-tracker.md
+- Always read full job description before making APPLY/SKIP decision
+- Quality over quantity: 3 strong proposals > 5 weak ones

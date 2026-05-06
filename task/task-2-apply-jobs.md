@@ -1,11 +1,11 @@
-# Task 2: Apply to Jobs — Pre-fill Proposal Forms via CDP
+# Task 2: Apply to Jobs — Fill Forms and Submit Proposals via CDP
 
 ## Context
 
 Repository: `freelance-ai-ops`
 Chrome CDP must be running at `127.0.0.1:9222` with the dedicated profile.
 
-Input files (written by Task 1):
+Input files:
 - `docs/proposal-drafts.md` — cover letters and rates for each job
 - `docs/proposal-tracker.md` — tracks status of all proposals
 
@@ -13,15 +13,16 @@ Input files (written by Task 1):
 
 - Chrome CDP running and logged into Upwork at `127.0.0.1:9222`
 - Upwork account has Connects available (Freelancer Plus plan or purchased bundle)
-- Task 1 already completed — `proposal-drafts.md` has entries with status "Ready to submit" in `proposal-tracker.md`
 - `pip install websockets`
 
-## CRITICAL SAFETY RULES
+## SUBMISSION RULES
 
-1. **DO NOT click Submit / Send Proposal / any button that finalizes submission**
-2. **DO NOT click "Buy Connects" or any purchase button**
+1. **YES — Click Submit / Send Proposal** to finalize each proposal (this is authorized)
+2. **DO NOT click "Buy Connects" or any purchase/payment button**
 3. **DO NOT send messages to clients**
-4. Only fill form fields. The user will review each pre-filled form and click Submit manually.
+4. **DO NOT accept contracts or offers**
+5. **Max 10 submissions per run** — stop after 10 to conserve Connects
+6. **Wait 8-15 seconds between submissions** (use `random.randint(8, 15)`)
 
 ## CRITICAL: Browser Access Rules
 
@@ -31,12 +32,12 @@ Input files (written by Task 1):
 
 ## CDP 工具函数
 
-完整的 CDP 工具函数（CDPSession class, navigate, evaluate, check_login, fill_input 等）在 `docs/cdp-utils.md` 中。所有 task 共用同一套工具代码。
+完整的 CDP 工具函数在 `docs/cdp-utils.md` 中。
 
 ## CDP Quick Reference
 
 ```python
-import websockets, json, asyncio, urllib.request, time
+import websockets, json, asyncio, urllib.request, time, random
 
 CDP_HTTP = "http://127.0.0.1:9222"
 
@@ -77,53 +78,66 @@ async with websockets.connect(tab["webSocketDebuggerUrl"], max_size=10_000_000) 
         return r.get("result", {}).get("value")
 ```
 
-## Step 1: Parse Proposals to Submit
+## Step 0: Determine Which Proposals to Process（重跑控制）
 
-Read `docs/proposal-tracker.md`. Filter rows where Status = "Ready to submit".
-Read `docs/proposal-drafts.md`. Match each "Ready to submit" job URL to its cover letter and rate.
+Read `docs/proposal-tracker.md` and select rows to process based on status:
 
-Build a list:
+**Processing order (priority):**
+1. Status = `"Pre-filled"` — 上次填了但没提交的，优先处理（只需重新打开页面提交）
+2. Status = `"Ready to submit"` — 新的，需要完整填写+提交
+
+**Skip these statuses:**
+- `Submitted` — 已提交
+- `Job closed` — 已失效
+- `Skipped`, `Blocked`, `Needs Connects`, `Fill failed`, `Submit failed` — 之前失败的
+
+This means: **重跑不会从头开始**。它会先处理上次遗留的 Pre-filled，再处理新的 Ready to submit。
+
+Read `docs/proposal-drafts.md` and match each processable job URL to its cover letter and rate.
+
 ```python
 proposals = [
-    {"title": "...", "url": "...", "cover_letter": "...", "rate": "...", "rate_type": "hourly|fixed"},
+    {"title": "...", "url": "...", "cover_letter": "...", "rate": "...", "rate_type": "hourly|fixed", "was_prefilled": True|False},
     ...
 ]
+submitted_count = 0
+max_submissions = 10
 ```
 
-## Step 2: For Each Proposal
+## Step 1: For Each Proposal
 
-Process one at a time. Wait 5 seconds between proposals to avoid rate limits.
+Process one at a time.
 
-### 2a. Navigate to Job Page
+### 1a. Navigate to Job Page / Proposal Form
 
 ```python
 await navigate(proposal["url"])
-await asyncio.sleep(2)
+await asyncio.sleep(3)
 ```
 
-### 2b. Check Job Status
+### 1b. Check Job Status
 
 ```python
-page_text = await evaluate("document.body.innerText.slice(0, 2000)")
+page_text = await evaluate("document.body.innerText.slice(0, 3000)")
 ```
 
 Check for:
 - "This job is closed" / "No longer accepting" → **skip**, update tracker to "Job closed"
-- "Log in" / "Sign Up" → **stop all**, session expired, tell user to re-login
-- "Buy Connects" without an Apply button → **skip**, update tracker to "Needs Connects"
+- "Log in" / "Sign Up" → **STOP ALL**, session expired
+- Page contains a proposal form already (if Pre-filled, form may already be open)
 
-### 2c. Find and Click Apply Button
-
-Try multiple selectors (Upwork changes their UI):
+### 1c. Find and Click Apply Button (if not already on form)
 
 ```python
 apply_result = await evaluate("""
 (() => {
-    // Try common apply button selectors
+    // Check if we're already on the proposal form
+    if (document.querySelector('textarea') && document.body.innerText.includes('Cover Letter')) {
+        return 'already on form';
+    }
     const selectors = [
         'button[data-test="apply-button"]',
         'a[data-test="apply-button"]',
-        'button.air3-btn-primary[data-test="submit-proposal-btn"]',
         'a[href*="/proposals/job/"]',
         'a[href*="apply/"]',
     ];
@@ -134,7 +148,6 @@ apply_result = await evaluate("""
             return 'clicked: ' + sel;
         }
     }
-    // Fallback: find by text content
     const allBtns = [...document.querySelectorAll('button, a')];
     const applyBtn = allBtns.find(el =>
         /apply now|submit a proposal/i.test(el.textContent) &&
@@ -151,35 +164,37 @@ apply_result = await evaluate("""
 
 If "not found" → **skip**, update tracker to "No apply button found".
 
-Wait for proposal form to load:
+Wait for proposal form:
 ```python
 await asyncio.sleep(5)
 ```
 
-### 2d. Verify Proposal Form Loaded
+### 1d. Verify Proposal Form
 
 ```python
 form_check = await evaluate("""
 (() => {
-    const text = document.body.innerText.slice(0, 3000);
-    const hasForm = text.includes('Cover Letter') || text.includes('cover letter')
-        || document.querySelector('textarea') !== null;
-    const needsConnects = text.includes('Buy Connects') || text.includes('purchase Connects');
-    return JSON.stringify({ hasForm, needsConnects, snippet: text.slice(0, 500) });
+    const text = document.body.innerText.slice(0, 5000);
+    const hasTextarea = document.querySelector('textarea') !== null;
+    const needsConnects = /buy connects|purchase connects/i.test(text);
+    const hasSubmitBtn = [...document.querySelectorAll('button')].some(b =>
+        /send proposal|submit proposal/i.test(b.textContent) && !b.disabled
+    );
+    return JSON.stringify({ hasTextarea, needsConnects, hasSubmitBtn, snippet: text.slice(0, 800) });
 })()
 """)
 ```
 
-If no form found or needs Connects → **skip**, update tracker accordingly.
+If `needsConnects` → **skip**, update tracker to "Needs Connects".
+If no textarea → **skip**, update tracker to "Form not found".
 
-### 2e. Fill Cover Letter
+### 1e. Fill Cover Letter
 
 ```python
 cover_letter_escaped = json.dumps(proposal["cover_letter"])
 
 fill_result = await evaluate(f"""
 (() => {{
-    // Find the cover letter textarea
     const textareas = [...document.querySelectorAll('textarea')];
     const ta = textareas.find(t =>
         t.getAttribute('data-test')?.includes('cover-letter')
@@ -187,16 +202,15 @@ fill_result = await evaluate(f"""
         || t.name?.includes('cover')
         || t.placeholder?.toLowerCase().includes('cover')
         || t.closest('[data-test*="cover"]')
-    ) || textareas[0]; // fallback to first textarea
+    ) || textareas[0];
 
     if (!ta) return 'no textarea found';
 
     ta.focus();
-    // Use native input setter to trigger React change detection
-    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+    const setter = Object.getOwnPropertyDescriptor(
         window.HTMLTextAreaElement.prototype, 'value'
     ).set;
-    nativeInputValueSetter.call(ta, {cover_letter_escaped});
+    setter.call(ta, {cover_letter_escaped});
     ta.dispatchEvent(new Event('input', {{ bubbles: true }}));
     ta.dispatchEvent(new Event('change', {{ bubbles: true }}));
     ta.dispatchEvent(new Event('blur', {{ bubbles: true }}));
@@ -205,16 +219,13 @@ fill_result = await evaluate(f"""
 """)
 ```
 
-### 2f. Fill Rate (Hourly Jobs)
-
-Only if rate_type is hourly:
+### 1f. Fill Rate (Hourly Jobs)
 
 ```python
 rate_value = proposal["rate"].replace("$", "").replace("/hr", "").strip()
 
-rate_result = await evaluate(f"""
+await evaluate(f"""
 (() => {{
-    // Find rate input
     const inputs = [...document.querySelectorAll('input[type="text"], input[type="number"], input:not([type])')];
     const rateInput = inputs.find(i =>
         i.getAttribute('data-test')?.includes('rate')
@@ -223,96 +234,299 @@ rate_result = await evaluate(f"""
         || i.closest('[data-test*="rate"]')
         || i.closest('label')?.textContent?.toLowerCase().includes('rate')
     );
-
-    if (!rateInput) return 'no rate input found';
-
+    if (!rateInput) return 'no rate input';
     rateInput.focus();
-    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+    const setter = Object.getOwnPropertyDescriptor(
         window.HTMLInputElement.prototype, 'value'
     ).set;
-    nativeInputValueSetter.call(rateInput, '{rate_value}');
+    setter.call(rateInput, '{rate_value}');
     rateInput.dispatchEvent(new Event('input', {{ bubbles: true }}));
     rateInput.dispatchEvent(new Event('change', {{ bubbles: true }}));
     rateInput.dispatchEvent(new Event('blur', {{ bubbles: true }}));
-    return 'filled: ' + rateInput.value;
+    return 'set: ' + rateInput.value;
 }})()
 """)
 ```
 
-### 2g. Verify Fill and Log — DO NOT SUBMIT
+### 1g. Handle Additional Form Fields（关键新增）
+
+Upwork 提案表单经常有额外字段。必须检测并处理：
 
 ```python
-verify = await evaluate("""
+extra_fields = await evaluate("""
 (() => {
-    const ta = document.querySelector('textarea');
-    const charCount = ta ? ta.value.length : 0;
-    const pageText = document.body.innerText.slice(0, 500);
-    return JSON.stringify({ coverLetterChars: charCount, pageSnippet: pageText });
+    const result = { questions: [], hasMilestones: false, hasDuration: false, hasFixedBid: false };
+
+    // 1. Client screening questions
+    // These appear as labeled textareas or text inputs beyond the cover letter
+    const allTextareas = [...document.querySelectorAll('textarea')];
+    const allLabels = [...document.querySelectorAll('label, [data-test*="question"], .question-text, h4, h5')];
+
+    for (const label of allLabels) {
+        const text = label.textContent.trim();
+        // Skip the cover letter label
+        if (/cover letter/i.test(text)) continue;
+        // Find associated input
+        const forId = label.getAttribute('for');
+        const input = forId ? document.getElementById(forId)
+            : label.closest('.question-container, .form-group, [class*="question"]')?.querySelector('textarea, input[type="text"]');
+        if (input && !input.value) {
+            result.questions.push({ question: text.slice(0, 200), tagName: input.tagName, inputId: input.id || '' });
+        }
+    }
+
+    // 2. Fixed-price bid amount
+    const bidInputs = [...document.querySelectorAll('input')].filter(i =>
+        /bid|amount|price|budget/i.test(i.getAttribute('data-test') || '')
+        || /bid|amount|price/i.test(i.name || '')
+        || i.closest('label')?.textContent?.toLowerCase()?.match(/bid|amount|your price/)
+    );
+    if (bidInputs.length > 0) result.hasFixedBid = true;
+
+    // 3. Milestone section
+    if (document.body.innerText.match(/milestone|project milestone/i)) {
+        result.hasMilestones = true;
+    }
+
+    // 4. Project duration
+    const durationSelects = document.querySelectorAll('select');
+    for (const sel of durationSelects) {
+        if (sel.closest('label')?.textContent?.toLowerCase()?.includes('duration')
+            || /duration|timeline/i.test(sel.name || '')) {
+            result.hasDuration = true;
+        }
+    }
+
+    return JSON.stringify(result);
 })()
 """)
-print(f"  Verified: {verify}")
-print(f"  STATUS: PRE-FILLED — waiting for user to review and click Submit")
 ```
 
-**STOP HERE. DO NOT click any submit/send button.**
+**Handle each extra field type:**
 
-## Step 3: Update Tracker
+#### Client Screening Questions
+Generate a brief, relevant answer for each question based on the cover letter context and job description:
 
-After processing all proposals, update `docs/proposal-tracker.md`:
+```python
+import json as json_lib
+fields = json_lib.loads(extra_fields)
 
-For successful pre-fills:
-```markdown
-| [date] | [title] | [url] | Pre-filled | [rate] | Form ready — user must click Submit |
+for q in fields["questions"]:
+    # Generate a concise answer (2-3 sentences) based on the question and our proposal
+    answer = generate_answer(q["question"], proposal["cover_letter"])
+    # The answer should be relevant, specific, and professional
+    # Fill it using the same native setter pattern
+    await evaluate(f"""
+    (() => {{
+        const inputs = [...document.querySelectorAll('textarea, input[type="text"]')];
+        const target = inputs.find(i => i.id === '{q["inputId"]}')
+            || document.querySelector('[id="{q["inputId"]}"]');
+        if (!target) return 'not found';
+        target.focus();
+        const proto = target.tagName === 'TEXTAREA'
+            ? window.HTMLTextAreaElement.prototype
+            : window.HTMLInputElement.prototype;
+        const setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
+        setter.call(target, {json.dumps(answer)});
+        target.dispatchEvent(new Event('input', {{ bubbles: true }}));
+        target.dispatchEvent(new Event('change', {{ bubbles: true }}));
+        return 'answered';
+    }})()
+    """)
 ```
 
-For failures:
-```markdown
-| [date] | [title] | [url] | [Failure reason] | [rate] | [Details] |
+When answering screening questions, follow these rules:
+- Keep answers to 2-3 sentences
+- Reference specific experience from the cover letter
+- If the question asks about availability: "Available to start immediately, typical response time under 2 hours during working hours."
+- If the question asks about experience with a tool/tech: be honest — if we know it, describe briefly; if not, describe the closest equivalent we know
+- If the question asks for portfolio/examples: include relevant GitHub demo link
+
+#### Fixed-Price Bid Amount
+```python
+if fields.get("hasFixedBid"):
+    bid_amount = proposal["rate"].replace("$", "").replace("fixed", "").strip()
+    # Only fill if we have a numeric value
+    await evaluate(f"""
+    (() => {{
+        const bidInput = [...document.querySelectorAll('input')].find(i =>
+            /bid|amount|price|budget/i.test(i.getAttribute('data-test') || i.name || '')
+            || i.closest('label')?.textContent?.toLowerCase()?.match(/bid|amount|your price/)
+        );
+        if (!bidInput) return 'no bid input';
+        bidInput.focus();
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+        setter.call(bidInput, '{bid_amount}');
+        bidInput.dispatchEvent(new Event('input', {{ bubbles: true }}));
+        bidInput.dispatchEvent(new Event('change', {{ bubbles: true }}));
+        return 'bid set: ' + bidInput.value;
+    }})()
+    """)
 ```
 
-Possible failure statuses: `Job closed`, `No apply button`, `Needs Connects`, `Form not found`, `Session expired`, `Fill failed`
+#### Duration / Timeline Select
+```python
+if fields.get("hasDuration"):
+    # Select a reasonable duration based on job scope
+    await evaluate("""
+    (() => {
+        const selects = document.querySelectorAll('select');
+        for (const sel of selects) {
+            if (sel.closest('label')?.textContent?.toLowerCase()?.includes('duration')
+                || /duration|timeline/i.test(sel.name || '')) {
+                // Pick "1 to 3 months" or similar mid-range option
+                const options = [...sel.options];
+                const preferred = options.find(o => /1 to 3|1-3|less than|1 month/i.test(o.text));
+                if (preferred) {
+                    sel.value = preferred.value;
+                    sel.dispatchEvent(new Event('change', { bubbles: true }));
+                    return 'duration set: ' + preferred.text;
+                }
+            }
+        }
+        return 'no duration select found';
+    })()
+    """)
+```
 
-## Step 4: Git
+### 1h. Final Pre-Submit Verification
+
+Before clicking Submit, verify:
+
+```python
+pre_submit = await evaluate("""
+(() => {
+    const ta = document.querySelector('textarea');
+    const coverOk = ta && ta.value.length > 50;
+    const submitBtn = [...document.querySelectorAll('button')].find(b =>
+        /send proposal|submit proposal/i.test(b.textContent.trim())
+        && !b.disabled
+        && !/buy|purchase|cancel|back|upgrade/i.test(b.textContent)
+    );
+    const btnDisabled = submitBtn ? submitBtn.disabled : true;
+    const pageText = document.body.innerText.slice(0, 500);
+    const needsConnects = /buy connects|purchase connects/i.test(pageText);
+    return JSON.stringify({
+        coverLetterOk: coverOk,
+        submitBtnFound: !!submitBtn,
+        submitBtnDisabled: btnDisabled,
+        needsConnects,
+        btnText: submitBtn?.textContent?.trim() || 'none',
+    });
+})()
+""")
+```
+
+If `submitBtnDisabled` or `needsConnects` → **skip**, update tracker.
+
+### 1i. CLICK SUBMIT
+
+```python
+submit_result = await evaluate("""
+(() => {
+    const allBtns = [...document.querySelectorAll('button')];
+    const submitBtn = allBtns.find(b =>
+        /send proposal|submit proposal/i.test(b.textContent.trim())
+        && !b.disabled
+        && b.offsetParent !== null
+        && !/buy|purchase|cancel|back|upgrade/i.test(b.textContent)
+    );
+    if (!submitBtn) return 'submit button not found';
+    submitBtn.click();
+    return 'clicked: ' + submitBtn.textContent.trim();
+})()
+""")
+```
+
+Wait and verify submission:
+```python
+await asyncio.sleep(6)
+
+post_submit = await evaluate("""
+(() => {
+    const text = document.body.innerText.slice(0, 1500);
+    const success = /proposal sent|proposal submitted|successfully|thank you/i.test(text);
+    const error = /error|failed|problem|try again/i.test(text);
+    const needsConnects = /buy connects|purchase connects/i.test(text);
+    return JSON.stringify({ success, error, needsConnects, snippet: text.slice(0, 400) });
+})()
+""")
+```
+
+Handle result:
+- `success` → update tracker to **"Submitted"**
+- `needsConnects` → update tracker to "Needs Connects"
+- `error` → update tracker to "Submit failed" with error snippet
+- button not found → update tracker to "Submit button not found"
+
+```python
+if success:
+    submitted_count += 1
+    if submitted_count >= max_submissions:
+        print(f"Reached max {max_submissions} submissions. Stopping.")
+        break
+
+# Random delay before next
+await asyncio.sleep(random.randint(8, 15))
+```
+
+## Step 2: Update Tracker
+
+Update `docs/proposal-tracker.md` with new statuses for every processed proposal.
+
+Status values:
+- `Submitted` — proposal sent successfully
+- `Pre-filled` — form filled but submit failed (will be retried next run)
+- `Job closed` — job no longer available
+- `Needs Connects` — insufficient Connects
+- `No apply button` — couldn't find apply button
+- `Form not found` — proposal form didn't load
+- `Fill failed` — couldn't fill required fields
+- `Submit failed` — submit button click didn't work
+- `Session expired` — redirected to login
+
+## Step 3: Git
 
 ```bash
 git add docs/proposal-tracker.md
-git commit -m "pre-fill proposals [date]"
+git commit -m "submit proposals [date] - [submitted_count] submitted"
 git push origin main
 ```
 
-## Step 5: Final Report
+## Step 4: Final Report
 
 ```
 === Apply Jobs Summary [date] ===
-Total proposals to process: X
-Successfully pre-filled: Y
-Skipped (job closed): A
-Skipped (no apply button): B
-Skipped (needs Connects): C
-Skipped (other error): D
+Total to process: X (Y pre-filled from last run + Z new)
+Successfully SUBMITTED: A
+Pre-filled but submit failed (retry next run): B
+Skipped (job closed): C
+Skipped (needs Connects): D
+Skipped (other): E
+Connects remaining: [if visible]
 
-Pre-filled proposals are open in Chrome tabs.
-Next step: User reviews each tab and clicks Submit on Upwork.
+Next step: Run Task 3 to monitor bid status
 ```
 
-## Constraints
+## Safety Constraints
 
-- **NEVER click Submit / Send Proposal**
-- **NEVER click Buy Connects or any purchase button**
-- **NEVER send messages**
-- Use Raw CDP only (no Playwright, no Windows MCP)
-- Process one proposal at a time with 5s delay between
-- If session expires (redirected to login), STOP and tell user
-- If form UI is unrecognizable, use `document.body.innerText` to inspect and adapt selectors
+- **ALLOWED:** Click "Send Proposal" / "Submit Proposal" to submit
+- **NEVER** click Buy Connects or any payment button
+- **NEVER** send messages to clients
+- **NEVER** accept contracts
+- Max 10 submissions per run
+- 8-15 second random delay between submissions
+- If session expires, STOP immediately
 - Log all actions for debugging
 
 ## Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
-| Apply button not found | Upwork may have redesigned. Use `document.body.innerText` to find the button text and adapt. |
-| Cover letter textarea not found | Check if form loaded. May need longer wait or different selector. |
-| Rate input not found | May be fixed-price job. Skip rate filling. |
-| "Buy Connects" shown | Account may need more Connects. Skip and log. |
-| Redirected to login | Session expired. STOP all. User must re-login in CDP Chrome. |
-| React doesn't detect value change | Use `nativeInputValueSetter` pattern (already in the code above). |
+| Apply button not found | Use `document.body.innerText` to inspect page. Upwork may have redesigned. |
+| Submit button disabled | Form may have required fields unfilled. Check for screening questions. |
+| "Buy Connects" shown | Skip — do NOT purchase. Log and move to next. |
+| Screening questions empty | Must answer them. Use `generate_answer()` based on job context. |
+| Fixed bid field empty | Fill with rate from proposal-drafts.md. |
+| Duration select unfilled | Pick mid-range option (1-3 months). |
+| Redirected to login | STOP ALL. User must re-login. |

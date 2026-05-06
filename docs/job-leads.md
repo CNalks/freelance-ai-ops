@@ -1,110 +1,88 @@
-# Job Leads - 2026-04-26
+# Job Leads - 2026-04-30
 
 ## Daily Run Summary
 
 - Source: Upwork Raw CDP, logged-in Chrome at `127.0.0.1:9222`.
 - Searches: FastAPI Python backend, OpenAI API integration, AI chatbot development, LLM application development, Python MVP.
-- Raw results: 50 scraped rows, 39 unique job IDs.
-- Deduplicated against tracker: 6 already tracked jobs skipped.
-- New jobs found: 33.
-- Notifications check: messages `0`; standard notifications selector `0`; visible nav hint showed `3 Notifications`.
-- No proposals submitted, no messages sent, no Connects purchase clicked.
+- Raw results: 50 scraped rows.
+- Deduplicated against tracker: 10 already tracked/duplicate jobs skipped.
+- New jobs found: 40 unique jobs.
+- AI reviewed: 10 candidates with full/visible job text.
+- Selected for proposal: 5.
+- Notifications check: messages `0`; notifications `0`.
+- No proposals submitted, no messages sent, no Connects purchase clicked during Task 1.
 
-## Top 5 Ready Leads
+## Selected Leads
 
-### 1. SSL and service communication certificate | updating and automation script
+### Lead Python QA Engineer & Code Auditor - Enterprise AI Security Backend (FastAPI / AWS)
 
-- URL: https://www.upwork.com/jobs/~022048072681828493976
-- Budget: $300 fixed
-- Posted: 8 minutes ago
-- Proposals: Less than 5
-- Client: Belgium, $10K+ spent, payment verified
-- Summary: Client needs SSL and service communication certificates updated across 6 systems/domains, then automated so the issue does not recur.
-- Why good fit: Practical Python/API automation with low competition, verified client, and clear first deliverable.
-- Suggested rate: $300 fixed
-- Priority: High
+- URL: https://www.upwork.com/jobs/Lead-span-class-highlight-Python-span-Engineer-amp-Code-Auditor-Enterprise-Security-span-class-highlight-Backend-span-span-class-highlight-FastAPI-span-AWS_~022049475114145139665/?referrer_url_path=/nx/search/jobs/
+- Budget: Hourly placeholder bid; client expects final milestone quote after shortlist.
+- Posted: Posted yesterday.
+- Proposals: Less than 5.
+- Client: United States, $1K+ spent, payment verified.
+- Decision: APPLY
+- Reasoning: Strong match for FastAPI, async Python, AWS SQS/S3, webhook resilience, and code-audit thinking. The client's screening questions are specific enough to differentiate a thoughtful technical proposal from generic AI/backend applicants.
+- Proposal angle: Position as a rigorous auditor for AI-generated backend code, focused on queues, webhooks, RBAC, S3 policy, and third-party failure paths.
+- Risk level: Medium
+- Expected Connects cost: visible on apply form, not recorded in docs.
 
-### 2. AI Software Engineer & Delivery Expert
+### Full-Stack Software Developer (Python + OpenAI + APIs + Web Dev) - Long-Term Position
 
-- URL: https://www.upwork.com/jobs/~022048071780701008492
-- Budget: $15-$30/hr
-- Posted: 12 minutes ago
-- Proposals: 5 to 10
-- Client: Nigeria, $1K+ spent, payment verified
-- Summary: Client needs an AI software engineer to support development of multiple products, platforms, and innovation projects.
-- Why good fit: Matches AI delivery, product execution, backend implementation, and clear communication positioning.
-- Suggested rate: $30/hr
-- Priority: High
+- URL: https://www.upwork.com/jobs/Full-Stack-Software-Developer-Python-span-class-highlight-OpenAI-span-span-class-highlight-APIs-span-Web-Dev-Long-Term-Position_~022049523389060121280/?referrer_url_path=/nx/search/jobs/
+- Budget: $15-$60/hr, less than 30 hrs/week, long-term.
+- Posted: Posted 14 minutes ago when rechecked.
+- Proposals: Less than 5.
+- Client: United States, $100K+ spent, payment verified.
+- Decision: APPLY
+- Reasoning: Excellent fit for Python, OpenAI/vector-store workflows, API integrations, and internal tool building. Strong client history and low proposal count outweigh the stated Eastern Europe preference.
+- Proposal angle: Lead with a concrete AssemblyAI-to-Markdown-to-vector-ingestion pipeline for the immediate Zoom archive project.
+- Risk level: Low/Medium
+- Expected Connects cost: visible on apply form, not recorded in docs.
 
-### 3. AI Voice & Avatar Developer for Real-Time Conversational Healthcare App
+### A developer for simple chat bot and landing page creation
 
-- URL: https://www.upwork.com/jobs/~022048018596377059989
-- Budget: $15,000 fixed
-- Posted: yesterday
-- Proposals: 20 to 50
-- Client: USA, $10K+ spent, payment verified
-- Summary: Touchscreen healthcare app with a human-like avatar, real-time voice interaction, and conversational AI.
-- Why good fit: Strong AI/voice/API integration fit and strong client budget, but high competition.
-- Suggested rate: $35/hr or paid discovery milestone
-- Priority: Medium
+- URL: https://www.upwork.com/jobs/span-class-highlight-developer-span-for-simple-chat-bot-and-landing-page-creation_~022049522974270293372/?referrer_url_path=/nx/search/jobs/
+- Budget: $500 fixed plus subscription-share model.
+- Posted: Posted 15 minutes ago when rechecked.
+- Proposals: 10 to 15.
+- Client: Cyprus, $22K spent, 100% hire rate, payment verified.
+- Decision: APPLY
+- Reasoning: Scope is clear and client history is strong. Fit is narrower than pure FastAPI/AI work, but Telegram chatbot, booking, email funnel, and calendar integration are practical automation work that can produce a fast review.
+- Proposal angle: Treat the landing page, chatbot, booking, email, and calendar pieces as one repeatable client-launch workflow.
+- Risk level: Medium
+- Expected Connects cost: 11 Connects visible on job page.
 
-### 4. AI Assistant Development for WhatsApp
+### Claude AI Expert Needed
 
-- URL: https://www.upwork.com/jobs/~022048042599670014613
-- Budget: $450 fixed
-- Posted: yesterday
-- Proposals: 20 to 50
-- Client: Thailand, $30K+ spent, payment verified
-- Summary: Build an AI assistant for WhatsApp with conversational AI, NLP, and API integration.
-- Why good fit: Direct fit for chatbot/API workflow, with credible client spend; proposal count is the main risk.
-- Suggested rate: $450 fixed
-- Priority: Medium
+- URL: https://www.upwork.com/jobs/Claude-span-class-highlight-span-Expert-Needed_~022049521586957962193/?referrer_url_path=/nx/search/jobs/
+- Budget: $250 fixed.
+- Posted: Posted 21 minutes ago when rechecked.
+- Proposals: 5 to 10.
+- Client: United States, $2.9K spent, payment verified.
+- Decision: APPLY
+- Reasoning: Direct match for AI automation strategy, Claude/Anthropic workflow design, CRM routing, Zapier-style integrations, and handoff documentation. Budget is modest, so the proposal constrains the first deliverable to one end-to-end workflow.
+- Proposal angle: Build one reliable lead workflow before connecting the entire marketing stack.
+- Risk level: Medium
+- Expected Connects cost: 14 Connects visible on job page.
 
-### 5. AI Exam Check automation using OpenAI
+### Computer Vision Engineer (HUD Parser)
 
-- URL: https://www.upwork.com/jobs/~022048009698611885831
-- Budget: $50 fixed
-- Posted: yesterday
-- Proposals: 15 to 20
-- Client: GBR, $100 spent, payment verified
-- Summary: Existing AI exam-check automation needs work with Python, React, OpenAI/Azure OpenAI, Azure services, and Docker.
-- Why good fit: Small but relevant OpenAI/Python/Docker troubleshooting job that may be useful for first-review momentum.
-- Suggested rate: $50 fixed trial
-- Priority: Medium
+- URL: https://www.upwork.com/jobs/Computer-Vision-Engineer-HUD-Parser_~022049438665247236053/?referrer_url_path=/nx/search/jobs/
+- Budget: $400 fixed.
+- Posted: Posted yesterday.
+- Proposals: Less than 5.
+- Client: GBR, $400+ spent, payment verified.
+- Decision: APPLY
+- Reasoning: The project has unusually clear architecture, tooling, dataset, eval targets, and production constraints. It is outside the strongest LLM niche and the budget is tight, but the Python/FastAPI/Pydantic/ONNX production loop gives enough overlap to submit a targeted proposal.
+- Proposal angle: Emphasize ROI validation, class imbalance, append-only eval logs, ONNX production path, and shadow-mode event correctness.
+- Risk level: Medium/High
+- Expected Connects cost: visible on apply form, not recorded in docs.
 
-## Backup Leads
+## Reviewed But Skipped
 
-### Build a Simple Web-Based AI Chat MVP
-
-- URL: https://www.upwork.com/jobs/~022048023008463923864
-- Budget: $15-$35/hr
-- Posted: 27 minutes ago
-- Proposals: 5 to 10
-- Client: Austria, $0 spent, payment unverified
-- Note: Excellent portfolio fit for AI chat plus dashboard, but skipped from top 5 because the client has no spend and payment is unverified.
-
-### Full-Stack Developer (AI + WordPress Automation Bot)
-
-- URL: https://www.upwork.com/jobs/~022048012372405234328
-- Budget: $200 fixed
-- Posted: yesterday
-- Proposals: 15 to 20
-- Client: USA, $300+ spent, payment verified
-- Note: Relevant AI API automation, but WordPress/PHP is not the core positioning and competition is above target.
-
-### Bubble.io Expert Needed for MVP Audit + OpenAI Chat Integration
-
-- URL: https://www.upwork.com/jobs/~022048060515054319367
-- Budget: $700 fixed
-- Posted: 48 minutes ago
-- Proposals: 5 to 10
-- Client: United States, $0 spent, payment unverified
-- Note: Good OpenAI concept but no-code/Bubble is not the strongest fit and client history is weak.
-
-## Filtered Out
-
-- Already tracked jobs were removed before scoring.
-- Jobs under `$30` fixed or below `$5/hr` were skipped.
-- Jobs with `50+` proposals were skipped.
-- Jobs with `$0 spent` plus weak or unverified client history were skipped unless kept as a backup note.
-- Mobile-only, WordPress-heavy, Odoo-specific, and unrelated QA/CV/embedded jobs were deprioritized.
+| Job | Reason |
+|-----|--------|
+| English (British) Male Voice Contributors Wanted | Voice-contribution task, not software implementation or AI ops work. |
+| Full Stack Engineer (React, TypeScript, Python/FastAPI) | Budget appeared below practical threshold for the expected full-stack scope. |
+| Backend Engineer - Data & API Systems | Less direct AI/FastAPI fit than the selected transcript, security-audit, and automation roles. |
