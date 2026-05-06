@@ -12,15 +12,18 @@ Collect candidate Upwork opportunities into structured records.
 
 ## Outputs
 
-- Future opportunity records in `data/jobs.jsonl` or an equivalent structured file.
+- Opportunity records in `data/jobs.jsonl`.
+- Source-level blockers in `data/runs.jsonl` and `sessions/*.md` for live CDP runs.
 
 ## Steps
 
 1. Read the daily plan and current opportunity records.
 2. Collect candidate jobs.
-3. Record each opportunity with the required schema fields.
-4. Do not score or authorize spend in this task.
-5. Write a session if Raw CDP is used in a future authorized run.
+3. Use visible page data only; do not store credentials, cookies, screenshots, IPs, Cloudflare Ray IDs, or private page artifacts.
+4. Record each opportunity with the required schema fields.
+5. If a source hits Cloudflare, login, CAPTCHA, verification, or blocked access, record the blocker and stop that source.
+6. Do not score or authorize spend in this task.
+7. Write a session if Raw CDP is used.
 
 ## Stop Conditions
 
@@ -28,6 +31,7 @@ Collect candidate Upwork opportunities into structured records.
 - Upwork login page or session expired.
 - CAPTCHA, abnormal verification, or blocked access.
 - A job cannot be represented with the opportunity schema.
+- The page is a Cloudflare interstitial instead of job content.
 
 ## Files To Read
 
@@ -45,7 +49,7 @@ Collect candidate Upwork opportunities into structured records.
 
 ## Session Requirements
 
-Future CDP collection runs must write a session file. This refactor task must not execute CDP.
+Every live CDP collection run writes `sessions/*.md`, even when blocked before collecting jobs.
 
 ## Safety Rules
 

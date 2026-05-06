@@ -15,6 +15,7 @@ Turn opportunity records into policy decisions and Connects allocations.
 - Recommended actions.
 - Proposal package authorizations.
 - Connects allocation records.
+- Explicit `submit_authorized` package candidates only when all policy thresholds pass.
 
 ## Steps
 
@@ -23,7 +24,8 @@ Turn opportunity records into policy decisions and Connects allocations.
 3. Score fit, client quality, competition, scope clarity, and risk.
 4. Choose `skip`, `draft_only`, `prefill_only`, or `submit_authorized`.
 5. Set `max_authorized_connects` only when action is not `skip`.
-6. Write decision reason for every selected opportunity.
+6. Use `submit_authorized` only for high-fit opportunities with credible client quality, low or moderate competition, clear scope, non-low pricing, acceptable observed Connects cost, and no forbidden risk.
+7. Write decision reason for every selected opportunity.
 
 ## Stop Conditions
 
@@ -31,6 +33,8 @@ Turn opportunity records into policy decisions and Connects allocations.
 - Missing required scores.
 - Connects cost exceeds daily cap.
 - Client or job risk triggers forbidden conditions.
+- Budget is below the pricing policy minimum for meaningful fixed-scope work.
+- Connects cost is not observed for a package that would be submitted.
 
 ## Files To Read
 
@@ -56,3 +60,4 @@ No CDP session is required. Record the manager run in `data/runs.jsonl` when thi
 - Do not operate CDP.
 - Do not spend Connects.
 - Do not use generic submit authorization.
+- Do not mark `submit_authorized` for low-budget, vague, high-competition, off-platform, free-test, or unobserved-Connects opportunities.

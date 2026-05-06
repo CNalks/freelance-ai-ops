@@ -10,6 +10,7 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 - Authorization policy.
 - Connects policy.
 - Session log template.
+- Delegated submit run authority, when present.
 
 ## Outputs
 
@@ -22,15 +23,16 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 
 1. Read authorized proposal packages before opening any live page.
 2. Confirm each package mode and max Connects.
-3. Use Raw CDP only.
-4. Open the job page and proposal form only when mode allows it.
-5. Discover form structure before filling.
-6. Record Connects cost, required fields, optional fields, warnings, and blockers.
-7. Stop on unknown required fields.
-8. Fill only authorized fields.
-9. Respect authorization mode.
-10. Write form observations and session record.
-11. Submit only with `submit_authorized` and all gates passed.
+3. Reject any package not listed by concrete ID for this run.
+4. Use Raw CDP only.
+5. Open the job page and proposal form only when mode allows it.
+6. Discover form structure before filling.
+7. Record Connects cost, required fields, optional fields, warnings, and blockers.
+8. Stop on unknown required fields.
+9. Fill only authorized fields.
+10. Respect authorization mode.
+11. Write form observations and session record.
+12. Submit only with `submit_authorized` and all gates passed.
 
 ## Stop Conditions
 
@@ -45,6 +47,8 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 - External communication or payment request.
 - Free test work.
 - Session expired or login page.
+- Package ID was not specifically authorized in the delegated run.
+- Boost UI is selected or required.
 
 ## Files To Read
 
@@ -74,3 +78,4 @@ Every execution run writes `sessions/*.md` using `templates/session-log-template
 - Never send client messages.
 - Submit only with `submit_authorized` and all gates passed.
 - Do not guess unknown required fields.
+- Never submit a package just because the run has general delegated authority; the package itself must be `submit_authorized`.

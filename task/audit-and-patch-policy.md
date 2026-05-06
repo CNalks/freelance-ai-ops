@@ -18,6 +18,7 @@ Review sessions, ledgers, and outcomes, then propose policy patches.
 - Wasted Connects.
 - Best categories.
 - Policy patches.
+- Explicit blocker classification for no-submit runs.
 
 ## Steps
 
@@ -25,14 +26,16 @@ Review sessions, ledgers, and outcomes, then propose policy patches.
 2. Calculate response rate and Connects efficiency.
 3. Identify wasted Connects and avoidable risk events.
 4. Identify best and weak categories.
-5. Write specific policy patches with evidence.
-6. Do not edit execution records.
+5. Classify no-submit runs as Cloudflare blocked, login blocked, no high-quality opportunity, Connects unavailable, or form gate failed.
+6. Write specific policy patches with evidence.
+7. Do not edit execution records.
 
 ## Stop Conditions
 
 - Missing session records for a live execution run.
 - Ledger and session data disagree on Connects spend.
 - Outcome data is too incomplete to support a policy patch.
+- A no-submit run lacks a concrete blocker.
 
 ## Files To Read
 
@@ -59,3 +62,4 @@ No CDP session is required. Record the audit run in `data/runs.jsonl` when struc
 - Do not operate CDP.
 - Do not perform fixes inside the audit task.
 - Emit policy patches, not generic advice.
+- Do not treat a blocked run as a failed submit unless a submit was actually attempted.

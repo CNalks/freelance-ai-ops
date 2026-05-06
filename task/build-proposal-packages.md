@@ -23,7 +23,8 @@ Build proposal packages from selected opportunities and reusable showcase packs.
 4. Set rate or bid and pricing rationale.
 5. Copy the authorized mode and max Connects from policy output.
 6. Add risk notes and stop conditions.
-7. Write proposal package records.
+7. For executable packages, include package ID, job URL, mode, max Connects, cover letter, rate or bid, pricing rationale, showcase pack ID, screening answer drafts, risk notes, and stop conditions.
+8. Write proposal package records.
 
 ## Stop Conditions
 
@@ -31,6 +32,7 @@ Build proposal packages from selected opportunities and reusable showcase packs.
 - Missing authorization mode.
 - Missing max Connects for a package that can enter a live form.
 - Scope is too unclear to write risk notes.
+- Cover letter, pricing, showcase selection, or stop conditions are missing.
 
 ## Files To Read
 
@@ -56,3 +58,4 @@ No CDP session is required. Record the run in `data/runs.jsonl` when proposal pa
 - Do not submit.
 - Do not infer missing authorization.
 - Stop if a required field must be answered from live form data that has not been observed.
+- Fixed-price bid amounts require a bounded pricing rationale before package execution.
