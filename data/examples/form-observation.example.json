@@ -1,0 +1,16 @@
+{
+  "id": "form-example",
+  "proposal_package_id": "pkg-example",
+  "job_url": "https://www.upwork.com/jobs/example",
+  "form_type": "fixed_price",
+  "connects_cost": 8,
+  "required_fields": ["cover_letter", "bid_amount"],
+  "optional_fields": ["portfolio_link"],
+  "unknown_required_fields": [],
+  "warnings": [],
+  "filled_fields": ["cover_letter", "bid_amount"],
+  "safe_to_submit": false,
+  "blockers": ["mode is prefill_only"],
+  "observed_at": "2026-05-06T00:00:00Z",
+  "source_session": "sessions/example.md"
+}

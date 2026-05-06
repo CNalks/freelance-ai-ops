@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ConnectsLedgerEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "date": { "type": "string" },
+    "event_type": { "type": "string" },
+    "opportunity_id": { "type": ["string", "null"] },
+    "proposal_package_id": { "type": ["string", "null"] },
+    "connects_delta": { "type": "integer" },
+    "connects_balance_observed": { "type": ["integer", "null"] },
+    "reason": { "type": "string" },
+    "source_session": { "type": ["string", "null"] },
+    "created_at": { "type": "string" }
+  },
+  "required": [
+    "id",
+    "date",
+    "event_type",
+    "opportunity_id",
+    "proposal_package_id",
+    "connects_delta",
+    "connects_balance_observed",
+    "reason",
+    "source_session",
+    "created_at"
+  ]
+}

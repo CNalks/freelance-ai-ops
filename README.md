@@ -2,6 +2,15 @@
 
 AI-assisted freelancing workflow for Upwork. This repo is the single source of truth for the profile, proposal templates, portfolio demos, job leads, proposal drafts, automation scripts, and active client projects.
 
+## Acquisition OS Entry Points
+
+1. Read `docs/acquisition-os-architecture.md`
+2. Set policy in `docs/connects-policy.md`
+3. Use `task/plan-daily-acquisition.md`
+4. Build proposal packages
+5. Execute only authorized CDP actions
+6. Review sessions and audit policy patches
+
 ## What This Repo Contains
 
 | Path | Purpose |

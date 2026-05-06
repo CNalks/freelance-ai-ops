@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProposalPackage",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "opportunity_id": { "type": "string" },
+    "job_url": { "type": "string" },
+    "mode": { "type": "string" },
+    "max_authorized_connects": { "type": "integer" },
+    "cover_letter": { "type": "string" },
+    "rate_or_bid": { "type": "string" },
+    "pricing_rationale": { "type": "string" },
+    "showcase_pack_id": { "type": "string" },
+    "screening_answers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "question": { "type": "string" },
+          "answer": { "type": "string" }
+        },
+        "required": ["question", "answer"]
+      }
+    },
+    "risk_notes": { "type": "string" },
+    "stop_conditions": { "type": "array", "items": { "type": "string" } },
+    "created_at": { "type": "string" }
+  },
+  "required": [
+    "id",
+    "opportunity_id",
+    "job_url",
+    "mode",
+    "max_authorized_connects",
+    "cover_letter",
+    "rate_or_bid",
+    "pricing_rationale",
+    "showcase_pack_id",
+    "screening_answers",
+    "risk_notes",
+    "stop_conditions",
+    "created_at"
+  ]
+}

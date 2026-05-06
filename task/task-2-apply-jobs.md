@@ -1,4 +1,13 @@
-# Task 2: Apply to Jobs — Fill Forms and Submit Proposals via CDP
+# Task 2: Apply to Jobs - Legacy Redirect
+
+This legacy task no longer grants submit authority. Use `task/execute-cdp-applications.md` with `docs/authorization-policy.md`.
+
+- Default mode is `prefill_only`.
+- Submit requires a specific `submit_authorized` proposal package ID and all required gates.
+- Buying Connects remains forbidden.
+- Unknown required fields pause execution.
+
+# Historical Task 2: Fill Forms and Submit Proposals via CDP
 
 ## Context
 
@@ -15,9 +24,9 @@ Input files:
 - Upwork account has Connects available (Freelancer Plus plan or purchased bundle)
 - `pip install websockets`
 
-## SUBMISSION RULES
+## HISTORICAL SUBMISSION RULES - SUPERSEDED
 
-1. **YES — Click Submit / Send Proposal** to finalize each proposal (this is authorized)
+1. **SUPERSEDED — this file does not authorize Submit / Send Proposal**
 2. **DO NOT click "Buy Connects" or any purchase/payment button**
 3. **DO NOT send messages to clients**
 4. **DO NOT accept contracts or offers**
@@ -419,7 +428,9 @@ pre_submit = await evaluate("""
 
 If `submitBtnDisabled` or `needsConnects` → **skip**, update tracker.
 
-### 1i. CLICK SUBMIT
+### 1i. HISTORICAL CLICK SUBMIT STEP - SUPERSEDED
+
+Do not execute this step from this legacy file. Use `task/execute-cdp-applications.md` and require `submit_authorized` plus all gates in `docs/authorization-policy.md`.
 
 ```python
 submit_result = await evaluate("""
@@ -508,9 +519,9 @@ Connects remaining: [if visible]
 Next step: Run Task 3 to monitor bid status
 ```
 
-## Safety Constraints
+## Historical Safety Constraints - Superseded By Authorization Policy
 
-- **ALLOWED:** Click "Send Proposal" / "Submit Proposal" to submit
+- **NOT AUTHORIZED BY THIS FILE:** Click "Send Proposal" / "Submit Proposal"
 - **NEVER** click Buy Connects or any payment button
 - **NEVER** send messages to clients
 - **NEVER** accept contracts

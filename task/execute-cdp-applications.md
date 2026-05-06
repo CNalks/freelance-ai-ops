@@ -1,0 +1,76 @@
+# Execute CDP Applications
+
+## Goal
+
+Execute authorized proposal package actions through Raw CDP while keeping CDP subordinate to policy authorization.
+
+## Inputs
+
+- Authorized proposal package IDs.
+- Authorization policy.
+- Connects policy.
+- Session log template.
+
+## Outputs
+
+- Form observations.
+- Session log.
+- Updated run record.
+- Optional proposal tracker report.
+
+## Steps
+
+1. Read authorized proposal packages before opening any live page.
+2. Confirm each package mode and max Connects.
+3. Use Raw CDP only.
+4. Open the job page and proposal form only when mode allows it.
+5. Discover form structure before filling.
+6. Record Connects cost, required fields, optional fields, warnings, and blockers.
+7. Stop on unknown required fields.
+8. Fill only authorized fields.
+9. Respect authorization mode.
+10. Write form observations and session record.
+11. Submit only with `submit_authorized` and all gates passed.
+
+## Stop Conditions
+
+- Package mode is `draft_only`.
+- Unknown required fields.
+- Connects cost missing.
+- Connects cost exceeds `max_authorized_connects`.
+- Buy Connects wall.
+- Payment or purchase button.
+- Job closed or no longer accepting.
+- Qualification warning that changes bid risk.
+- External communication or payment request.
+- Free test work.
+- Session expired or login page.
+
+## Files To Read
+
+- `docs/authorization-policy.md`
+- `docs/connects-policy.md`
+- `docs/cdp-utils.md`
+- `data/proposal-packages.jsonl`
+- `data/schemas/form-observation.schema.json`
+- `templates/session-log-template.md`
+
+## Files To Write
+
+- `data/form-observations.jsonl`
+- `data/runs.jsonl`
+- `sessions/*.md`
+- Human report files only when requested.
+
+## Session Requirements
+
+Every execution run writes `sessions/*.md` using `templates/session-log-template.md`, even if no form is filled.
+
+## Safety Rules
+
+- Use Raw CDP only.
+- Never buy Connects.
+- Never click payment or purchase buttons.
+- Never send client messages.
+- Submit only with `submit_authorized` and all gates passed.
+- Do not guess unknown required fields.

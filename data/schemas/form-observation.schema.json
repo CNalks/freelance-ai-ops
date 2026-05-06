@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FormObservation",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "proposal_package_id": { "type": "string" },
+    "job_url": { "type": "string" },
+    "form_type": { "type": "string" },
+    "connects_cost": { "type": ["integer", "null"] },
+    "required_fields": { "type": "array", "items": { "type": "string" } },
+    "optional_fields": { "type": "array", "items": { "type": "string" } },
+    "unknown_required_fields": { "type": "array", "items": { "type": "string" } },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "filled_fields": { "type": "array", "items": { "type": "string" } },
+    "safe_to_submit": { "type": "boolean" },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "observed_at": { "type": "string" },
+    "source_session": { "type": "string" }
+  },
+  "required": [
+    "id",
+    "proposal_package_id",
+    "job_url",
+    "form_type",
+    "connects_cost",
+    "required_fields",
+    "optional_fields",
+    "unknown_required_fields",
+    "warnings",
+    "filled_fields",
+    "safe_to_submit",
+    "blockers",
+    "observed_at",
+    "source_session"
+  ]
+}

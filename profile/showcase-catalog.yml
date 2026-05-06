@@ -1,0 +1,85 @@
+showcase_packs:
+  - id: fastapi-llm-backend
+    name: FastAPI LLM Backend
+    use_when:
+      - FastAPI
+      - Python backend
+      - OpenAI API
+      - streaming
+      - extraction
+      - summarization
+    avoid_when:
+      - frontend-only work
+      - unclear backend scope
+    proof_assets:
+      - portfolio/demo-fastapi-llm
+    proposal_angle: "I can ship a focused Python API layer with clear endpoints, typed payloads, and LLM features that are easy to test."
+    pricing_anchor: "Hourly for evolving API work, fixed milestone for a bounded endpoint set."
+    default_clarifying_question: "Which endpoints and LLM actions need to be in the first working milestone?"
+
+  - id: rag-chatbot
+    name: RAG Chatbot
+    use_when:
+      - RAG
+      - chatbot
+      - LangChain
+      - ChromaDB
+      - knowledge base
+    avoid_when:
+      - no source documents
+      - no target user flow
+    proof_assets:
+      - portfolio/demo-rag-chatbot
+    proposal_angle: "I can build a retrieval chatbot around your actual content, with ingestion, retrieval, and API behavior separated cleanly."
+    pricing_anchor: "Fixed discovery and prototype milestone, then hourly iteration for retrieval quality."
+    default_clarifying_question: "What content sources should the chatbot answer from in the first version?"
+
+  - id: ai-ops-dashboard
+    name: AI Ops Dashboard
+    use_when:
+      - dashboard
+      - internal tool
+      - workflow visibility
+      - reporting
+    avoid_when:
+      - no data source
+      - purely visual redesign
+    proof_assets:
+      - https://cnalks.github.io/freelance-ai-ops/
+    proposal_angle: "I can turn an AI workflow into a usable operations dashboard with clear metrics, queues, and review states."
+    pricing_anchor: "Fixed UI slice for static dashboard, hourly when live integrations are required."
+    default_clarifying_question: "Which metrics or workflow states do you need to see on day one?"
+
+  - id: crm-ai-automation
+    name: CRM AI Automation
+    use_when:
+      - CRM
+      - lead follow-up
+      - pipeline automation
+      - AI agents
+    avoid_when:
+      - no CRM named
+      - off-platform payment or contact requirements
+    proof_assets:
+      - AI Ops Dashboard
+      - FastAPI LLM backend
+    proposal_angle: "I can connect lead data, follow-up logic, and AI drafting into a controlled workflow that keeps human approval where needed."
+    pricing_anchor: "Fixed first milestone for one pipeline path, then hourly expansion."
+    default_clarifying_question: "Which CRM and which lead stage should the first automation cover?"
+
+  - id: mvp-product-slice
+    name: MVP Product Slice
+    use_when:
+      - founder MVP
+      - first product slice
+      - scope control
+      - milestone delivery
+    avoid_when:
+      - broad unbounded app builds
+      - no acceptance criteria
+    proof_assets:
+      - dashboard
+      - FastAPI backend
+    proposal_angle: "I can define and build the smallest useful product slice first, with a clear milestone and testable acceptance criteria."
+    pricing_anchor: "Fixed milestone for the first slice, hourly only after the slice is accepted."
+    default_clarifying_question: "What is the smallest workflow a user must complete for the MVP to be useful?"

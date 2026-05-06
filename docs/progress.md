@@ -49,6 +49,18 @@
 - [x] Codex Automations — 自动化 prompt (`docs/codex-automations.md`)
 - [x] Old task files archived to `task/archive/`
 
+## Acquisition OS Refactor
+
+- [x] Architecture doc
+- [x] Agents rules
+- [x] Authorization policy
+- [x] Connects policy
+- [x] Data schemas
+- [x] Showcase catalog
+- [x] Pipeline task files
+- [x] Automation policy cleanup
+- [x] Session template
+
 ## Upwork Account
 
 - [x] Freelancer Plus plan purchased (100 Connects/month)

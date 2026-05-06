@@ -1,0 +1,20 @@
+{
+  "id": "pkg-example",
+  "opportunity_id": "opp-example",
+  "job_url": "https://www.upwork.com/jobs/example",
+  "mode": "prefill_only",
+  "max_authorized_connects": 8,
+  "cover_letter": "Draft cover letter goes here.",
+  "rate_or_bid": "$500 fixed",
+  "pricing_rationale": "First milestone is scoped around a working CRM follow-up prototype.",
+  "showcase_pack_id": "crm-ai-automation",
+  "screening_answers": [
+    {
+      "question": "Do you have CRM automation experience?",
+      "answer": "Yes. I have built AI workflow and dashboard demos that map well to CRM lead follow-up."
+    }
+  ],
+  "risk_notes": "Stop if the live form asks for free test work or off-platform contact.",
+  "stop_conditions": ["unknown required fields", "Buy Connects wall", "connects cost above 8"],
+  "created_at": "2026-05-06T00:00:00Z"
+}

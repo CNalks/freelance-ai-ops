@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Run",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "task_file": { "type": "string" },
+    "session_file": { "type": "string" },
+    "mode": { "type": "string" },
+    "started_at": { "type": "string" },
+    "ended_at": { "type": "string" },
+    "input_ids": { "type": "array", "items": { "type": "string" } },
+    "actions_taken": { "type": "array", "items": { "type": "string" } },
+    "files_changed": { "type": "array", "items": { "type": "string" } },
+    "result": { "type": "string" },
+    "blockers": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": [
+    "id",
+    "task_file",
+    "session_file",
+    "mode",
+    "started_at",
+    "ended_at",
+    "input_ids",
+    "actions_taken",
+    "files_changed",
+    "result",
+    "blockers"
+  ]
+}

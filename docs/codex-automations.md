@@ -1,123 +1,124 @@
-# Codex Automations — 定时/手动触发任务
+# Codex Automations
 
-给 Codex Desktop 创建自动化任务时，复制下面的 prompt。
+Automations must follow `docs/authorization-policy.md`. A schedule or prompt does not grant submit authority by itself.
 
----
+## Mode 1: Dry Run
 
-## Automation 1: 获客循环（按需 / 有 Connects 时）
+Use for planning, scoring, packaging, and audit work.
 
-**调度**: 手动触发，当你有 Connects 且想投新 proposal 时
-**前提**: Chrome CDP 在 127.0.0.1:9222 已运行并登录 Upwork；账户有可用 Connects
+Allowed:
 
-**Prompt:**
-```
-在 C:\Users\a8744\Desktop\for-codex\Upwork\freelance-ai-ops 仓库中按顺序执行：
+- Read docs and structured data.
+- Create or update proposal packages.
+- Produce manager handoffs.
+- Produce audit reports and policy patches.
 
-1. 完成 task/task-1-find-jobs.md（搜索、筛选、AI策略评审、写proposal）
-2. 完成 task/task-2-apply-jobs.md（填写完整表单并点击Submit提交proposal——这是用户明确授权的操作）
+Forbidden:
 
-CDP 工具函数参考 docs/cdp-utils.md。
-Chrome CDP 已在 127.0.0.1:9222 运行且已登录 Upwork。
-所有 git push 到 origin main。
+- Submit proposals.
+- Buy Connects.
+- Send client messages.
+- Accept or decline contracts.
+- Run live CDP unless explicitly authorized for safe collection.
 
-重要规则：
-- Task 2: 允许且必须点击 Submit/Send Proposal 提交proposal（已授权）
-- Task 2: 必须填写所有表单字段，包括screening questions、bid amount、duration，不能只填cover letter
-- Task 2: 每次最多提交10个，每个之间随机等8-15秒
-- Task 2: 如果proposal-tracker里有Pre-filled状态的条目，优先处理它们
-- 禁止：点击Buy Connects或任何购买/支付按钮
-- 禁止：发送消息给客户
-- 禁止：接受合同或offer
-- 只用Raw CDP（禁止Playwright、禁止Windows MCP）
-```
+Prompt shape:
 
----
+```text
+In C:\Users\a8744\Desktop\for-codex\Upwork\freelance-ai-ops, run the Acquisition OS planning and packaging flow.
 
-## Automation 2: 跟进循环（每天 1-2 次）
-
-**调度**: 每天 10:00 和 18:00（或你方便的时间）
-**前提**: Chrome CDP 在 127.0.0.1:9222 已运行并登录 Upwork
-
-**Prompt:**
-```
-在 C:\Users\a8744\Desktop\for-codex\Upwork\freelance-ai-ops 仓库中按顺序执行：
-
-1. 完成 task/task-3-monitor-bids.md（检查已投proposal状态、竞争变化、客户浏览记录）
-2. 完成 task/task-4-client-comms.md（检查消息和通知，草拟回复）
-
-CDP 工具函数参考 docs/cdp-utils.md。
-Chrome CDP 已在 127.0.0.1:9222 运行且已登录 Upwork。
-所有 git push 到 origin main。
-
-重要规则：
-- 禁止：发送消息给客户（只草拟，用户手动发送）
-- 禁止：接受合同或offer
-- 禁止：点击Buy Connects或任何购买/支付按钮
-- 只用Raw CDP（禁止Playwright、禁止Windows MCP）
+Read docs/acquisition-os-architecture.md, docs/authorization-policy.md, docs/connects-policy.md, and profile/showcase-catalog.yml.
+Do not submit proposals.
+Do not buy Connects.
+Do not send client messages.
+Do not run live CDP unless the task explicitly authorizes safe collection.
 ```
 
----
+## Mode 2: Prefill Only
 
-## Automation 3: 优化循环（每周 1 次）
+Use when the manager has produced proposal package IDs with mode `prefill_only`.
 
-**调度**: 每周日 20:00
-**前提**: Chrome CDP 运行中
+Allowed:
 
-**Prompt:**
-```
-在 C:\Users\a8744\Desktop\for-codex\Upwork\freelance-ai-ops 仓库中执行：
+- Open job page.
+- Open proposal form.
+- Discover form.
+- Fill authorized fields.
+- Write form observations.
+- Write session.
+- Stop before final submit.
 
-1. 完成 task/task-5-analytics.md（采集数据、分析转化漏斗）
-2. 如果 response rate < 15% 或 profile views 下降，接着执行 task/task-6-optimize.md
+Forbidden:
 
-CDP 工具函数参考 docs/cdp-utils.md。
-Chrome CDP 已在 127.0.0.1:9222 运行且已登录 Upwork。
-```
+- Click Submit.
+- Click Send Proposal.
+- Click Buy Connects.
+- Click purchase or payment buttons.
+- Send client messages.
 
----
+Prompt shape:
 
-## Automation 4: 紧急消息检查（按需手动）
+```text
+In C:\Users\a8744\Desktop\for-codex\Upwork\freelance-ai-ops, execute only the specified proposal package IDs in prefill_only mode.
 
-**调度**: 手动触发，当你想快速检查有没有客户回复时
-**前提**: Chrome CDP 运行中
-
-**Prompt:**
-```
-在 C:\Users\a8744\Desktop\for-codex\Upwork\freelance-ai-ops 仓库中执行：
-只完成 task/task-4-client-comms.md（检查消息，草拟回复）。
-
-CDP 在 127.0.0.1:9222，已登录。不要发送任何消息。
-```
-
----
-
-## 使用说明
-
-1. 在 Codex Desktop 中创建 Automation
-2. 复制上面的 prompt
-3. 设置调度时间
-4. 确保在调度时间前启动 CDP Chrome 并登录 Upwork
-
-### 循环之间的关系
-
-```
-获客循环（按需）     跟进循环（每天）      优化循环（每周）
-Task 1 → Task 2     Task 3 → Task 4      Task 5 → Task 6
-找工作 → 提交        监控 → 消息           分析 → 优化
-需要Connects         不需要Connects        不需要Connects
+Use Raw CDP only.
+Read docs/authorization-policy.md before any live action.
+Read task/execute-cdp-applications.md and the authorized proposal packages.
+Discover the form before filling.
+Stop on unknown required fields.
+Write data/form-observations.jsonl and sessions/*.md.
+Do not click Submit or Send Proposal.
+Do not buy Connects.
+Do not send messages.
 ```
 
-- 三个循环完全独立，互不阻塞
-- 没有 Connects 时：只跑跟进循环和优化循环
-- Chrome 崩溃只影响当前循环，其他循环下次正常跑
-- 获客循环产出的 proposal 进入 proposal-tracker.md，跟进循环读取并监控
+## Mode 3: Submit Authorized
 
-### 注意事项
+Use only for proposal package IDs explicitly marked `submit_authorized`.
 
-- 如果 CDP Chrome 没有运行，Codex 会报错并停止（只影响当次循环）
-- 如果 Upwork 登录过期，Codex 会检测到并提醒你重新登录
-- Task 2 会自动提交 proposal（已授权），每次最多 10 个
-- Task 4 只草拟回复，不会自动发送——你需要手动发送
-- Codex 永远不会点击 Buy Connects 或任何支付按钮
-- Codex 会自动 git push，你可以在 GitHub 上查看每次的变更
-- 如果上次有 Pre-filled 未提交的 proposal，下次获客循环会优先处理它们
+Allowed:
+
+- Open job page.
+- Discover form.
+- Fill fields.
+- Submit only the explicitly authorized package IDs if every gate passes.
+
+Required gates:
+
+- Package ID is explicitly authorized.
+- Job ID is explicitly authorized.
+- Connects cost is observed.
+- Connects cost is less than or equal to `max_authorized_connects`.
+- No unknown required fields.
+- No Buy Connects wall.
+- No payment or purchase button.
+- No off-platform payment request.
+- No free test task requirement.
+- Form validation passes.
+- Proposal package has cover letter, rate or bid, showcase selection, and risk note.
+
+Forbidden:
+
+- Buy Connects.
+- Submit packages not listed in the authorization.
+- Send client messages.
+- Accept or decline contracts.
+
+Prompt shape:
+
+```text
+In C:\Users\a8744\Desktop\for-codex\Upwork\freelance-ai-ops, execute only the specified submit_authorized proposal package IDs.
+
+Use Raw CDP only.
+Read docs/authorization-policy.md and task/execute-cdp-applications.md before any live action.
+Submit only if all required gates pass.
+Stop on any forbidden condition.
+Write data/form-observations.jsonl and sessions/*.md.
+Never click Buy Connects or any purchase/payment button.
+Never send client messages.
+```
+
+## Relationship Between Modes
+
+`Dry Run` creates plans and packages. `Prefill Only` can fill authorized fields and stops before submit. `Submit Authorized` is scoped to specific proposal package IDs and expires with that authorization.
+
+The retired legacy auto-apply instruction is no longer valid.
