@@ -15,31 +15,34 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 ## Outputs
 
 - Form observations.
+- Inspected package gate decisions.
 - Session log.
 - Updated run record.
 - Optional proposal tracker report.
 
 ## Steps
 
-1. Read authorized proposal packages before opening any live page.
+1. Read proposal packages before opening any live page.
 2. Confirm each package mode and max Connects.
 3. Reject any package not listed by concrete ID for this run.
 4. Use Raw CDP only.
-5. Open the job page and proposal form only when mode allows it.
-6. Discover form structure before filling.
-7. Record Connects cost, required fields, optional fields, warnings, and blockers.
-8. Stop on unknown required fields.
+5. Open the job page and proposal form for `prefill_only` or `submit_authorized` packages.
+6. Inspect form structure before any submit decision.
+7. Record Connects cost, observed balance, required fields, optional fields, warnings, and blockers.
+8. Stop final submit on unknown required fields.
 9. Fill only authorized fields.
-10. Respect authorization mode.
+10. Promote a concrete package ID to `submit_authorized` only after inspected gates pass under delegated run authority.
 11. Write form observations and session record.
 12. Submit only with `submit_authorized` and all gates passed.
 
 ## Stop Conditions
 
 - Package mode is `draft_only`.
-- Unknown required fields.
-- Connects cost missing.
+- Unknown required fields before final submit.
+- Connects cost missing before final submit.
+- Connects balance missing before final submit.
 - Connects cost exceeds `max_authorized_connects`.
+- Planned Connects spend exceeds observed balance.
 - Buy Connects wall.
 - Payment or purchase button.
 - Job closed or no longer accepting.
@@ -49,6 +52,8 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 - Session expired or login page.
 - Package ID was not specifically authorized in the delegated run.
 - Boost UI is selected or required.
+- Fixed-price budget is below `$500`.
+- Fixed-price bid is not the approved `$300` or `$500` first-milestone amount.
 
 ## Files To Read
 
@@ -77,5 +82,7 @@ Every execution run writes `sessions/*.md` using `templates/session-log-template
 - Never click payment or purchase buttons.
 - Never send client messages.
 - Submit only with `submit_authorized` and all gates passed.
+- Treat `prefill_only` form observation as inspection, not a failed execution.
 - Do not guess unknown required fields.
 - Never submit a package just because the run has general delegated authority; the package itself must be `submit_authorized`.
+- Fixed-price cover letters must say the bid is for a first milestone, not the full project.

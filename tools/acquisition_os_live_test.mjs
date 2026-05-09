@@ -16,6 +16,8 @@ const RUN_ID = `run-${RUN_DATE}-acquisition-os-live-test-${RUN_STAMP}`;
 const SESSION_FILE = `sessions/${RUN_DATE}-acquisition-os-live-test-${RUN_STAMP}.md`;
 const SOURCE_SESSION = SESSION_FILE;
 const MODE = "delegated_submit_run";
+const INSPECT_LIMIT = 5;
+const MAX_SUBMISSIONS = 3;
 
 const SEARCH_URLS = [
   ["best-matches", "https://www.upwork.com/nx/find-work/best-matches"],
@@ -104,8 +106,12 @@ function jobIdFromUrl(url) {
   return (String(url).match(/~0?(\d{12,})/) || [])[1] || slug(url);
 }
 
+function jobTokenFromUrl(url) {
+  return (String(url).match(/~(0?\d{12,})/) || [])[1] || jobIdFromUrl(url);
+}
+
 function applyUrl(jobUrl) {
-  const id = jobIdFromUrl(jobUrl);
+  const id = jobTokenFromUrl(jobUrl);
   return `https://www.upwork.com/nx/proposals/job/~${id}/apply/`;
 }
 
@@ -119,12 +125,29 @@ function parseMoney(text) {
   return amount;
 }
 
+function parseMaxMoney(text) {
+  const raw = String(text || "").replace(/,/g, "");
+  const matches = [...raw.matchAll(/\$\s*(\d+(?:\.\d+)?)([kKmM])?/g)];
+  if (!matches.length) return null;
+  return Math.max(...matches.map((match) => {
+    let amount = Number(match[1]);
+    if (match[2]?.toLowerCase() === "k") amount *= 1000;
+    if (match[2]?.toLowerCase() === "m") amount *= 1000000;
+    return amount;
+  }));
+}
+
 function parseConnects(text) {
   const matches = [...String(text || "").matchAll(/(\d{1,3})\s+Connects/gi)].map((m) => Number(m[1]));
   return matches.find((n) => n > 0 && n < 100) ?? null;
 }
 
 function parseConnectsBalance(text) {
+  const remaining = String(text || "").match(/you\W*ll have\s+(\d{1,5})\s+Connects\s+remaining/i);
+  if (remaining) {
+    const cost = parseConnects(text) || 0;
+    return Number(remaining[1]) + cost;
+  }
   const patterns = [
     /Available\s+Connects[:\s]+(\d{1,5})/i,
     /Connects\s+available[:\s]+(\d{1,5})/i,
@@ -436,6 +459,17 @@ function inferCategory(text) {
   return "fastapi-llm-backend";
 }
 
+function fixedFirstMilestoneBid(opp) {
+  if (opp.budget_type !== "fixed") return null;
+  const budget = parseMaxMoney(`${opp.budget || ""} ${opp.description_excerpt || ""}`);
+  if (budget === null || budget < 500) return null;
+  return budget < 1000 ? "$300 fixed first milestone" : "$500 fixed first milestone";
+}
+
+function isHourlyPackage(pkg) {
+  return /\$[0-9.,]+\s*\/hr/i.test(pkg.rate_or_bid);
+}
+
 async function enrichOpportunity(opp) {
   await cdp.navigate(opp.job_url, 5500);
   const state = await pageState();
@@ -464,9 +498,22 @@ async function enrichOpportunity(opp) {
 async function collectOpportunities() {
   const collected = [];
   for (const [source, url] of SEARCH_URLS) {
-    await cdp.navigate(url, 6500);
-    const state = await pageState();
-    const blocker = classifyBlocker(state);
+    let state = null;
+    let blocker = null;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      await cdp.navigate(url, 6500);
+      state = await pageState();
+      blocker = classifyBlocker(state);
+      if (!blocker || !/login|session/i.test(blocker) || attempt === 1) break;
+      actions.push(`${source}: login/session blocker observed; warming up best-matches once`);
+      await cdp.navigate("https://www.upwork.com/nx/find-work/best-matches", 6500);
+      const warmup = await pageState();
+      const warmupBlocker = classifyBlocker(warmup);
+      if (warmupBlocker) {
+        actions.push(`${source}: warm-up blocked by ${warmupBlocker}`);
+        break;
+      }
+    }
     if (blocker) {
       blockers.push(`${source}: ${blocker}`);
       actions.push(`stopped source ${source}: ${blocker}`);
@@ -504,7 +551,6 @@ function scoreOpportunity(opp) {
   if (offPlatform) risk += 5;
   if (freeTest) risk += 5;
   if (!opp.payment_verified) risk += 1;
-  if (!opp.connects_cost) risk += 1;
   risk = Math.min(10, risk);
 
   const expected = fit >= 8 && client >= 6 && competition >= 6 && clarity >= 6 && risk <= 4 ? "high" : fit >= 6 && risk <= 6 ? "medium" : "low";
@@ -513,12 +559,11 @@ function scoreOpportunity(opp) {
   if (offPlatform || freeTest || veryLowBudget) {
     action = "skip";
     reason = offPlatform ? "Off-platform communication risk." : freeTest ? "Free-test risk." : "Budget is below the minimum practical threshold.";
-  } else if (expected === "high" && opp.connects_cost !== null) {
-    action = "submit_authorized";
-    reason = "High fit, credible client signals, acceptable competition, clear enough scope, and observed Connects cost.";
   } else if (fit >= 6 && risk <= 6) {
     action = "prefill_only";
-    reason = opp.connects_cost === null ? "Technical fit is acceptable, but Connects cost is not observed for submit." : "Fit is acceptable but submit threshold is not fully met.";
+    reason = expected === "high"
+      ? "High-potential candidate; inspect apply form before submit authorization."
+      : "Fit is acceptable; inspect apply form before any submit decision.";
   }
 
   return {
@@ -536,8 +581,17 @@ function scoreOpportunity(opp) {
 
 function buildPackage(opp) {
   const hourly = opp.budget_type === "hourly";
-  const mode = opp.recommended_action === "submit_authorized" && hourly ? "submit_authorized" : opp.recommended_action === "skip" ? "draft_only" : "prefill_only";
+  const fixedBid = fixedFirstMilestoneBid(opp);
+  const mode = opp.recommended_action === "skip" ? "draft_only" : "prefill_only";
   const maxConnects = opp.connects_cost ?? 0;
+  const fixedBudget = opp.budget_type === "fixed" ? parseMaxMoney(`${opp.budget || ""} ${opp.description_excerpt || ""}`) : null;
+  const pricingRationale = hourly
+    ? "Uses the current profile base rate for serious Python, FastAPI, AI, and API work."
+    : fixedBid
+      ? "User-authorized fixed-price first milestone amount; the cover letter states this is not a full-project bid."
+      : fixedBudget !== null && fixedBudget < 500
+        ? "Fixed-price budget is below the automatic submit floor; keep prefill_only."
+        : "Fixed-price budget is unknown or unclear; keep manual review.";
   return {
     id: `pkg-${jobIdFromUrl(opp.job_url)}`,
     opportunity_id: opp.id,
@@ -545,10 +599,8 @@ function buildPackage(opp) {
     mode,
     max_authorized_connects: maxConnects,
     cover_letter: coverLetter(opp),
-    rate_or_bid: hourly ? "$35/hr" : "manual fixed-price review required",
-    pricing_rationale: hourly
-      ? "Uses the current profile base rate for serious Python, FastAPI, AI, and API work."
-      : "Fixed-price amount is not auto-submitted; a bounded milestone needs manual review first.",
+    rate_or_bid: hourly ? "$35/hr" : fixedBid || "manual fixed-price review required",
+    pricing_rationale: pricingRationale,
     showcase_pack_id: inferCategory(`${opp.title} ${opp.description_excerpt}`),
     screening_answers: [],
     risk_notes: `Scores: fit ${opp.fit_score}, client ${opp.client_quality_score}, competition ${opp.competition_score}, clarity ${opp.scope_clarity_score}, risk ${opp.risk_score}. ${opp.decision_reason}`,
@@ -559,7 +611,7 @@ function buildPackage(opp) {
       "boost requirement",
       "off-platform contact request",
       "free test work",
-      `connects cost above ${maxConnects}`,
+      "connects cost above authorized package max",
     ],
     created_at: now(),
   };
@@ -567,6 +619,7 @@ function buildPackage(opp) {
 
 function coverLetter(opp) {
   const pack = inferCategory(`${opp.title} ${opp.description_excerpt}`);
+  const fixedBid = fixedFirstMilestoneBid(opp);
   const angle = pack === "rag-chatbot"
     ? "I can separate ingestion, retrieval, and API behavior so the chatbot is testable from the first milestone."
     : pack === "crm-ai-automation"
@@ -579,19 +632,24 @@ function coverLetter(opp) {
     "",
     "For a first milestone, I would keep the scope narrow: confirm the inputs, build the core workflow/API path, add basic validation, and leave you with something reviewable instead of a broad unfinished build.",
     "",
+    ...(fixedBid ? [
+      `My fixed-price bid is for this small first milestone only (${fixedBid}), not the full project scope.`,
+      "",
+    ] : []),
     "A few details I would confirm before starting: the exact first workflow, any existing API/database constraints, and what output would count as accepted for the first delivery.",
     "",
     "Best,",
   ].join("\n");
 }
 
-async function inspectAndMaybeSubmit(pkg) {
+async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
   const observation = {
     id: `form-${pkg.id}-${RUN_STAMP}`,
     proposal_package_id: pkg.id,
     job_url: pkg.job_url,
     form_type: "unknown",
     connects_cost: null,
+    connects_balance_observed: null,
     required_fields: [],
     optional_fields: [],
     unknown_required_fields: [],
@@ -610,6 +668,7 @@ async function inspectAndMaybeSubmit(pkg) {
   const text = state.text;
   observation.connects_cost = parseConnects(text);
   const balance = parseConnectsBalance(text);
+  observation.connects_balance_observed = balance;
   observation.form_type = /hourly/i.test(text) || /#step-rate/i.test(text) ? "hourly" : /fixed/i.test(text) ? "fixed_price" : "unknown";
 
   const rawBefore = await cdp.evaluate(`JSON.stringify((() => {
@@ -622,6 +681,7 @@ async function inspectAndMaybeSubmit(pkg) {
         id: el.id || '',
         name: el.getAttribute('name') || '',
         required: !!el.required || el.getAttribute('aria-required') === 'true',
+        checked: !!el.checked,
         visible: rect.width > 0 && rect.height > 0,
         value: el.value || '',
         label: (el.getAttribute('aria-label') || el.getAttribute('placeholder') || '').slice(0, 120)
@@ -641,12 +701,13 @@ async function inspectAndMaybeSubmit(pkg) {
   observation.required_fields = visibleControls.filter((control) => control.required).map((control) => control.label || control.name || control.id || `${control.tag}-${control.index}`);
   observation.optional_fields = visibleControls.filter((control) => !control.required).map((control) => control.label || control.name || control.id || `${control.tag}-${control.index}`);
 
-  if (pkg.mode !== "submit_authorized") observation.blockers.push(`mode is ${pkg.mode}`);
   if (observation.connects_cost === null) observation.blockers.push("Connects cost missing");
-  if (observation.connects_cost !== null && observation.connects_cost > pkg.max_authorized_connects) observation.blockers.push("Connects cost exceeds authorization");
+  if (balance === null) observation.blockers.push("Connects balance missing");
+  if (observation.connects_cost !== null && pkg.max_authorized_connects > 0 && observation.connects_cost > pkg.max_authorized_connects) observation.blockers.push("Connects cost exceeds authorization");
   if (balance !== null && observation.connects_cost !== null && observation.connects_cost > balance) observation.blockers.push("Connects cost exceeds observed balance");
   if (/buy connects|purchase connects/i.test(text)) observation.blockers.push("Buy Connects wall");
   if ((before.buttons || []).some((button) => button.visible && /buy|purchase/i.test(button.text))) observation.blockers.push("payment or purchase button");
+  if (visibleControls.some((control) => control.checked && /boost|bid/i.test(`${control.label} ${control.name} ${control.id}`))) observation.blockers.push("boost requirement");
   if (/boost your proposal|boosted proposal|bid for boosted/i.test(text)) observation.warnings.push("Boost UI observed; boost not used");
   if (/payment|purchase/i.test(text) && /button/i.test(text)) observation.warnings.push("Payment or purchase wording observed");
   if (/outside upwork|off-platform|telegram|whatsapp|skype/i.test(text)) observation.blockers.push("off-platform communication risk");
@@ -656,10 +717,15 @@ async function inspectAndMaybeSubmit(pkg) {
   const coverFilled = await fillFirstTextarea(pkg.cover_letter);
   if (coverFilled) observation.filled_fields.push("cover_letter");
 
-  const hourlyFilled = await fillHourlyRate(pkg.rate_or_bid);
+  const hourlyPackage = isHourlyPackage(pkg);
+  const hourlyFilled = hourlyPackage ? await fillHourlyRate(pkg.rate_or_bid) : false;
   if (hourlyFilled) observation.filled_fields.push("hourly_rate");
+  const fixedFilled = !hourlyPackage && !pkg.rate_or_bid.includes("manual fixed-price")
+    ? await fillFixedBid(pkg.rate_or_bid)
+    : false;
+  if (fixedFilled) observation.filled_fields.push("fixed_first_milestone_bid");
 
-  const requiredTextareasAfterCover = textareas.slice(1);
+  const requiredTextareasAfterCover = textareas.slice(1).filter((control) => control.required);
   for (const control of requiredTextareasAfterCover) {
     observation.unknown_required_fields.push(control.label || control.name || control.id || `textarea-${control.index}`);
   }
@@ -668,6 +734,7 @@ async function inspectAndMaybeSubmit(pkg) {
     if (!control.required) return false;
     if (control.tag === "TEXTAREA" && control.index === textareas[0]?.index && coverFilled) return false;
     if ((control.id === "step-rate" || control.name === "step-rate") && hourlyFilled) return false;
+    if (!hourlyPackage && fixedFilled && control.tag === "INPUT" && /amount|bid|price|budget|milestone|fixed/i.test(`${control.label} ${control.name} ${control.id}`)) return false;
     return !control.value;
   });
   for (const control of unfilledRequired) {
@@ -680,9 +747,10 @@ async function inspectAndMaybeSubmit(pkg) {
   const submitInfo = await getSubmitInfo();
   if (!submitInfo.hasSubmitButton) observation.blockers.push("submit button not found");
   if (submitInfo.submitDisabled) observation.blockers.push("submit button disabled");
+  if (attemptSubmit && pkg.mode !== "submit_authorized") observation.blockers.push(`mode is ${pkg.mode}`);
   observation.safe_to_submit = observation.blockers.length === 0 && submitInfo.hasSubmitButton && !submitInfo.submitDisabled;
 
-  if (observation.safe_to_submit) {
+  if (attemptSubmit && observation.safe_to_submit) {
     const clickResult = await clickSubmit();
     actions.push(`${pkg.id}: clicked submit button`);
     await sleep(5000);
@@ -759,12 +827,38 @@ async function fillHourlyRate(rateText) {
   return !!result;
 }
 
+async function fillFixedBid(rateText) {
+  const amount = Number((String(rateText).match(/(\d+(?:\.\d+)?)/) || [])[1] || 0);
+  if (!amount) return false;
+  const result = await cdp.evaluate(`(() => {
+    const candidates = Array.from(document.querySelectorAll('input')).filter((item) => {
+      const rect = item.getBoundingClientRect();
+      const label = [item.id, item.name, item.getAttribute('aria-label'), item.placeholder].join(' ');
+      return rect.width > 0
+        && rect.height > 0
+        && !item.disabled
+        && (item.getAttribute('type') || '').toLowerCase() !== 'hidden'
+        && /amount|bid|price|budget|milestone|fixed/i.test(label)
+        && !/fee|service|receive|connect/i.test(label);
+    });
+    const el = candidates[0];
+    if (!el) return false;
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    setter.call(el, ${JSON.stringify(String(amount))});
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    el.dispatchEvent(new Event('blur', { bubbles: true }));
+    return true;
+  })()`);
+  return !!result;
+}
+
 async function getSubmitInfo() {
   const raw = await cdp.evaluate(`JSON.stringify((() => {
     const buttons = Array.from(document.querySelectorAll('button')).filter((button) => {
       const text = (button.textContent || '').trim();
       const rect = button.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0 && /send proposal|submit proposal|submit/i.test(text) && !/buy|purchase|boost/i.test(text);
+      return rect.width > 0 && rect.height > 0 && /send proposal|submit proposal|send for \\d+\\s+connects|submit/i.test(text) && !/buy|purchase|boost/i.test(text);
     });
     const button = buttons[0];
     return { hasSubmitButton: !!button, submitDisabled: button ? button.disabled : true, text: button ? button.textContent.trim() : '' };
@@ -777,12 +871,56 @@ async function clickSubmit() {
     const button = Array.from(document.querySelectorAll('button')).find((item) => {
       const text = (item.textContent || '').trim();
       const rect = item.getBoundingClientRect();
-      return rect.width > 0 && rect.height > 0 && /send proposal|submit proposal|submit/i.test(text) && !/buy|purchase|boost/i.test(text) && !item.disabled;
+      return rect.width > 0 && rect.height > 0 && /send proposal|submit proposal|send for \\d+\\s+connects|submit/i.test(text) && !/buy|purchase|boost/i.test(text) && !item.disabled;
     });
     if (!button) return 'submit button not found';
     button.click();
     return 'clicked ' + button.textContent.trim();
   })()`);
+}
+
+function authorizeAfterInspection(packages, observations, opportunitiesById) {
+  const observationsByPackage = new Map(observations.map((obs) => [obs.proposal_package_id, obs]));
+  let plannedSpend = 0;
+  let authorizedCount = 0;
+
+  for (const pkg of packages) {
+    if (pkg.mode !== "prefill_only") continue;
+    const observation = observationsByPackage.get(pkg.id);
+    if (!observation) continue;
+    const opportunity = opportunitiesById.get(pkg.opportunity_id);
+    const gateBlockers = [...new Set(observation.blockers)];
+
+    if (!opportunity || opportunity.expected_value_band !== "high") gateBlockers.push("expected value is not high enough for submit");
+    if (opportunity && opportunity.client_quality_score < 6) gateBlockers.push("client quality below submit threshold");
+    if (opportunity && opportunity.competition_score < 6) gateBlockers.push("competition below submit threshold");
+    if (opportunity && opportunity.scope_clarity_score < 6) gateBlockers.push("scope clarity below submit threshold");
+    if (opportunity && opportunity.risk_score > 4) gateBlockers.push("risk score above submit threshold");
+    if (gateBlockers.length === 0 && authorizedCount >= MAX_SUBMISSIONS) {
+      gateBlockers.push("submission limit reached");
+    }
+    if (gateBlockers.length === 0 && plannedSpend + observation.connects_cost > observation.connects_balance_observed) {
+      gateBlockers.push("planned Connects spend exceeds observed balance");
+    }
+
+    if (gateBlockers.length === 0) {
+      pkg.mode = "submit_authorized";
+      pkg.max_authorized_connects = observation.connects_cost;
+      plannedSpend += observation.connects_cost;
+      authorizedCount += 1;
+      pkg.risk_notes = `${pkg.risk_notes} Inspect gates passed; this concrete package ID was upgraded under the user-authorized delegated submit run.`;
+      actions.push(`${pkg.id}: promoted to submit_authorized after form inspect`);
+    } else {
+      pkg.risk_notes = `${pkg.risk_notes} Inspect blockers: ${gateBlockers.join("; ")}`;
+      for (const blocker of gateBlockers) {
+        if (!observation.blockers.includes(blocker)) observation.blockers.push(blocker);
+      }
+      observation.safe_to_submit = false;
+    }
+  }
+
+  actions.push(`authorized ${authorizedCount} packages after inspect; planned Connects spend ${plannedSpend}`);
+  return { authorizedCount, plannedSpend };
 }
 
 async function monitorOutcomes(packages) {
@@ -814,7 +952,7 @@ function writeSession({ opportunities, packages, observations }) {
   const submitted = submittedPackageIds.length ? submittedPackageIds.join(", ") : "none";
   const blockerText = blockers.length ? blockers.map((item) => `- ${item}`).join("\n") : "- none";
   const warningText = warnings.length ? warnings.map((item) => `- ${item}`).join("\n") : "- none";
-  const obsRows = observations.map((obs) => `| ${obs.proposal_package_id} | ${obs.job_url} | ${obs.connects_cost ?? ""} | ${obs.required_fields.join("; ")} | ${obs.unknown_required_fields.join("; ")} | ${[...obs.warnings, ...obs.blockers].join("; ")} | ${obs.safe_to_submit} |`).join("\n");
+  const obsRows = observations.map((obs) => `| ${obs.proposal_package_id} | ${obs.job_url} | ${obs.connects_cost ?? ""} | ${obs.connects_balance_observed ?? ""} | ${obs.required_fields.join("; ")} | ${obs.unknown_required_fields.join("; ")} | ${[...obs.warnings, ...obs.blockers].join("; ")} | ${obs.safe_to_submit} |`).join("\n");
   const text = `# Execution Session Log
 
 ## Identity
@@ -840,8 +978,8 @@ function writeSession({ opportunities, packages, observations }) {
 
 ## Form Observations
 
-| Proposal Package ID | Job URL | Connects Cost | Required Fields | Unknown Required Fields | Warnings | Safe To Submit |
-|---|---|---:|---|---|---|---|
+| Proposal Package ID | Job URL | Connects Cost | Observed Balance | Required Fields | Unknown Required Fields | Warnings | Safe To Submit |
+|---|---|---:|---:|---|---|---|---|
 ${obsRows}
 
 ## Actions Taken
@@ -867,6 +1005,7 @@ ${warningText}
 - ${SESSION_FILE}
 - data/jobs.jsonl
 - data/proposal-packages.jsonl
+- data/connects-ledger.jsonl
 - data/form-observations.jsonl
 - data/runs.jsonl
 
@@ -928,21 +1067,26 @@ async function main() {
   const packageInputs = scored
     .filter((opp) => opp.recommended_action !== "skip")
     .sort((a, b) => (b.fit_score + b.client_quality_score + b.competition_score - b.risk_score) - (a.fit_score + a.client_quality_score + a.competition_score - a.risk_score))
-    .slice(0, 5);
+    .slice(0, INSPECT_LIMIT);
   const packages = packageInputs.map(buildPackage);
-  writeJsonl("data/proposal-packages.jsonl", packages);
   actions.push(`built ${packages.length} proposal packages`);
 
-  const executable = packages.filter((pkg) => pkg.mode === "submit_authorized");
-  if (!executable.length) blockers.push("no package met submit_authorized threshold");
-  const executionTargets = executable.length ? executable : packages.filter((pkg) => pkg.mode === "prefill_only").slice(0, 2);
-  if (executionTargets.length && !executable.length) actions.push(`observing ${executionTargets.length} prefill_only packages to cover execute-stage gates`);
   const observations = [];
-  for (const pkg of executionTargets) {
-    const obs = await inspectAndMaybeSubmit(pkg);
+  for (const pkg of packages) {
+    const obs = await inspectAndMaybeSubmit(pkg, { attemptSubmit: false });
     observations.push(obs);
-    appendLine("data/form-observations.jsonl", obs);
   }
+
+  authorizeAfterInspection(packages, observations, new Map(scored.map((opp) => [opp.id, opp])));
+  writeJsonl("data/proposal-packages.jsonl", packages);
+
+  const executable = packages.filter((pkg) => pkg.mode === "submit_authorized").slice(0, MAX_SUBMISSIONS);
+  if (!executable.length) blockers.push("no package met submit_authorized threshold");
+  for (const pkg of executable) {
+    const obs = await inspectAndMaybeSubmit(pkg, { attemptSubmit: true });
+    observations.push(obs);
+  }
+  writeJsonl("data/form-observations.jsonl", observations);
 
   await monitorOutcomes(packages);
   writeAuditPatchIfNeeded(observations);
@@ -960,6 +1104,7 @@ async function main() {
     files_changed: [
       "data/jobs.jsonl",
       "data/proposal-packages.jsonl",
+      "data/connects-ledger.jsonl",
       "data/form-observations.jsonl",
       "data/outcomes.jsonl",
       "data/policy-patches.jsonl",

@@ -106,7 +106,7 @@ Forbidden:
 Prompt shape:
 
 ```text
-In C:\Users\a8744\Desktop\for-codex\Upwork\freelance-ai-ops, execute only the specified submit_authorized proposal package IDs.
+In C:\Users\a8744\Desktop\for-codex\freelance-ai-ops, execute only the specified submit_authorized proposal package IDs.
 
 Use Raw CDP only.
 Read docs/authorization-policy.md and task/execute-cdp-applications.md before any live action.

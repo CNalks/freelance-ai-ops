@@ -49,7 +49,11 @@ Use this as the default for serious AI/LLM, FastAPI, and MVP work. Quote below i
 - If the client budget is strong and scope is specialized, quote `$35/hr` or higher.
 - If the job is fixed-price and scope is unclear, ask for a short discovery milestone instead of guessing a full project price.
 - If the job is underpriced but strategically useful, state the normal rate and optionally offer a small trial milestone.
-- Do not pre-fill fixed-price bid amounts automatically; user decides after reviewing Connects, scope, and Upwork form details.
+- For delegated submit runs, fixed-price jobs may be auto-filled only as a small first milestone after the apply form has been inspected.
+- Fixed-price budgets below `$500` are not auto-submitted.
+- Fixed-price budgets from `$500-$999` use a `$300 fixed first milestone`.
+- Fixed-price budgets of `$1,000+` use a `$500 fixed first milestone`.
+- Fixed-price cover letters must state the bid is for the first milestone only, not the full project scope.
 
 ## Connects Budget
 

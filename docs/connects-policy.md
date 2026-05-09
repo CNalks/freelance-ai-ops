@@ -48,11 +48,16 @@ Treat weak client quality as a reason to reduce max authorized Connects or choos
 - Zero-spend clients require stronger scope clarity and lower competition.
 - High-competition jobs require strong category fit, fast posting time, and a distinctive showcase pack.
 - Fixed-price unclear scope should default to `draft_only` or `prefill_only` unless an approved milestone is included.
+- Fixed-price budgets below `$500` are not auto-submitted.
+- Fixed-price budgets from `$500-$999` may use a `$300` first milestone after form inspection.
+- Fixed-price budgets of `$1,000+` may use a `$500` first milestone after form inspection.
+- The cover letter must state that a fixed-price bid is for a first milestone only.
 - Do not spend Connects when the expected value band is low and competition is high.
 
 ## Minimum Fields Before Spending Connects
 
 - `connects_cost`
+- `connects_balance_observed`
 - `fit_score`
 - `client_quality_score`
 - `competition_score`
@@ -60,6 +65,8 @@ Treat weak client quality as a reason to reduce max authorized Connects or choos
 - `expected_value_band`
 - `recommended_action`
 - `reason`
+
+Missing `connects_cost` should not block opening the apply form for inspection. It blocks final submit unless the form inspection observes a cost that fits the package cap and current visible balance.
 
 ## Sample Decision Record
 
