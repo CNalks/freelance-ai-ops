@@ -10,7 +10,7 @@ The user grants agents authority to make acquisition decisions inside this repo:
 
 - Choose target categories and offers.
 - Design and improve service products, demos, proposal templates, and proof assets.
-- Allocate available Connects within the active budget and reserve floor.
+- Allocate available Connects for qualifying proposals; the active reserve floor is `0` unless the user explicitly asks to preserve Connects.
 - Build proposal packages.
 - Promote concrete proposal package IDs to `submit_authorized` when all policy gates pass.
 - Draft client replies and negotiation positions.
@@ -64,13 +64,13 @@ Delegated submit is allowed only when all conditions are true:
 - Execution channel is allowed by `docs/upwork-platform-rules.md`.
 - Observed Connects cost is present.
 - Observed Connects balance is present.
-- Cost is within package cap, daily cap, weekly cap, and reserve floor.
+- Cost is within package cap, daily cap, weekly cap, visible balance, and any nonzero reserve floor.
 - No unknown required fields.
 - No Buy Connects, purchase, payment, boost, or subscription UI is selected.
 - No off-platform contact or payment request.
 - No free test work.
 - Pricing satisfies `docs/pricing.md`.
-- Fixed-price bid is an approved first milestone amount.
+- Fixed-price bid is an approved first paid scope amount.
 - Session and ledger outputs are written.
 
 ## Message Gates
@@ -92,8 +92,7 @@ Escalate to the user instead of sending when the message involves a contract off
 
 Connects are operating capital.
 
-- Maintain a reserve floor before any delegated submit run.
-- Spend early Connects on high-fit, clear-scope jobs with credible clients and low or moderate competition.
+- Do not maintain a Connects reserve by default; spend visible available Connects on high-fit, clear-scope jobs with credible clients and low or moderate competition.
 - Track official free-Connects opportunities without gaming rewards.
 - Do not buy Connects.
 - Do not boost unless a specific boosted proposal is explicitly authorized.

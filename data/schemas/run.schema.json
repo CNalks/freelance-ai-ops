@@ -35,6 +35,7 @@
     "actions_taken": { "type": "array", "items": { "type": "string" } },
     "files_changed": { "type": "array", "items": { "type": "string" } },
     "result": { "type": "string" },
+    "submit_attempted": { "type": "array", "items": { "type": "string" } },
     "blockers": { "type": "array", "items": { "type": "string" } },
     "summary_metrics": {
       "type": "object",

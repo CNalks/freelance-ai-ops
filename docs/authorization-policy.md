@@ -57,16 +57,17 @@ submit_authorized:
     - job_id is explicitly authorized
     - proposal package ID is explicitly authorized
     - platform execution channel is allowed
-    - connects_cost <= authorized max_connects
-    - connects_cost <= observed Connects balance
-    - no unknown required fields
+- connects_cost <= authorized max_connects
+- connects_cost <= observed Connects balance
+- active reserve floor may be `0`; preserving leftover Connects is not a submit gate unless the active plan sets a reserve above `0`
+- no unknown required fields
     - no Buy Connects wall
     - no payment/purchase button
     - no off-platform payment request
     - no free test task requirement
     - form validation passes
     - proposal package has cover letter, rate/bid, showcase selection, and risk note
-    - fixed-price bids, if any, are approved first-milestone amounts
+    - fixed-price bids, if any, are approved first paid scope amounts
 
 message_send_authorized:
   allowed:
@@ -96,9 +97,9 @@ Stop if any condition appears:
 - Connects cost exceeds observed balance.
 - Job closed or no longer accepting.
 - Qualification warning that changes bid risk.
-- Fixed-price scope unclear and no approved milestone.
-- Fixed-price budget below `$500` for auto-submit.
-- Fixed-price bid is not the approved `$300` or `$500` first-milestone amount.
+- Fixed-price scope unclear and no approved first paid scope.
+- Fixed-price budget below `$50` for auto-submit.
+- Fixed-price bid is not the approved first paid scope amount for the visible budget band.
 - External communication or payment request.
 - Free test work.
 - Buy Connects or purchase wall.

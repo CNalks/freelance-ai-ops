@@ -5,11 +5,11 @@ Connects are investment capital. The system should spend them only when expected
 ## Budget Model
 
 - Set a weekly Connects budget before collecting jobs.
-- Set a daily cap before scoring opportunities.
-- Set a reserve floor before delegated submit.
-- Reserve Connects for high-fit late-week opportunities.
+- Set a daily cap high enough that visible balance, not artificial reserve, is the practical limit.
+- Set the active reserve floor to `0` unless the user explicitly asks to preserve Connects.
+- Spend available Connects on qualifying opportunities instead of saving them for hypothetical later jobs.
 - Record every observed cost, spend, refund, and balance in the spend ledger.
-- Do not authorize a submit if the observed spend would take the account below the reserve floor.
+- Do not authorize a submit if the observed spend exceeds visible balance.
 
 ## Earning Connects
 
@@ -67,19 +67,21 @@ Treat weak client quality as a reason to reduce max authorized Connects or choos
 | FastAPI backend | Spend when API scope, integrations, and deployment expectations are defined. |
 | RAG/chatbot | Spend when knowledge source, user flow, and success criteria are described. |
 | CRM/workflow automation | Spend when pipeline, follow-up logic, and existing tools are named. |
-| MVP/internal tools | Spend when first milestone can be bounded and shipped independently. |
+| MVP/internal tools | Spend when the first paid scope can be bounded and shipped independently. |
 
 ## Risk Rules
 
 - Zero-spend clients require stronger scope clarity and lower competition.
 - High-competition jobs require strong category fit, fast posting time, and a distinctive showcase pack.
-- Fixed-price unclear scope should default to `draft_only` or `prefill_only` unless an approved milestone is included.
-- Fixed-price budgets below `$500` are not auto-submitted.
-- Fixed-price budgets from `$500-$999` may use a `$300` first milestone after form inspection.
-- Fixed-price budgets of `$1,000+` may use a `$500` first milestone after form inspection.
-- The cover letter must state that a fixed-price bid is for a first milestone only.
+- Fixed-price unclear scope should default to `draft_only` or `prefill_only` unless an approved first paid scope can be stated.
+- Fixed-price budgets below `$50` are not auto-submitted.
+- Fixed-price budgets from `$50-$499` may use the visible budget as the first paid scope after form inspection.
+- Fixed-price budgets from `$50-$99` may pass a small first-review exception when fit and client quality are strong, competition is acceptable, clarity is strong, and submit score is at least `28`.
+- Fixed-price budgets from `$500-$999` may use a `$300` first paid scope after form inspection.
+- Fixed-price budgets of `$1,000+` may use a `$500` first paid scope after form inspection.
+- The cover letter must state that a fixed-price bid is for the first paid scope only.
 - Do not spend Connects when the expected value band is low and competition is high.
-- Do not spend below the active reserve floor.
+- Do not preserve a reserve unless the active plan explicitly sets one above `0`.
 - Do not spend on a proposal only to qualify for a Connects reward.
 
 ## Minimum Fields Before Spending Connects

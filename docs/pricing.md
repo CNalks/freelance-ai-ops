@@ -49,14 +49,16 @@ Use this as the default for serious AI/LLM, FastAPI, and MVP work. Quote below i
 - If the client budget is strong and scope is specialized, quote `$35/hr` or higher.
 - If the job is fixed-price and scope is unclear, ask for a short discovery milestone instead of guessing a full project price.
 - If the job is underpriced but strategically useful, state the normal rate and optionally offer a small trial milestone.
-- For delegated submit runs, fixed-price jobs may be auto-filled only as a small first milestone after the apply form has been inspected.
-- Fixed-price budgets below `$500` are not auto-submitted.
-- Fixed-price budgets from `$500-$999` use a `$300 fixed first milestone`.
-- Fixed-price budgets of `$1,000+` use a `$500 fixed first milestone`.
-- Fixed-price cover letters must state the bid is for the first milestone only, not the full project scope.
+- For delegated submit runs, fixed-price jobs may be auto-filled only as a small first paid scope after the apply form has been inspected.
+- Fixed-price budgets below `$50` are not auto-submitted.
+- Fixed-price budgets from `$50-$499` use the visible budget as the first paid scope.
+- Fixed-price budgets from `$50-$99` are allowed only for high-fit first-review jobs with credible client signals and submit score at least `28`.
+- Fixed-price budgets from `$500-$999` use a `$300 fixed first scope`.
+- Fixed-price budgets of `$1,000+` use a `$500 fixed first scope`.
+- Fixed-price cover letters must state the bid is for the first paid scope only, not the full project scope.
 
 ## Connects Budget
 
-- Allocate 10-15 Connects per week during cold start.
+- Spend available Connects on qualifying proposals; do not preserve a default reserve.
 - Prioritize jobs with payment verification, at least one hire, posted within 24 hours, and fewer than 15 proposals.
 - Deprioritize jobs with no spend, vague requirements, very low fixed budgets, or high proposal counts unless fit is exceptional.

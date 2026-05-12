@@ -35,6 +35,7 @@ const SEARCH_URLS = [
 const actions = [];
 const blockers = [];
 const warnings = [];
+const submitAttemptedPackageIds = [];
 const submittedPackageIds = [];
 let candidateCardsCollected = 0;
 let cdp;
@@ -558,8 +559,21 @@ function inferCategory(text) {
 function fixedFirstMilestoneBid(opp) {
   if (opp.budget_type !== "fixed") return null;
   const budget = parseMaxMoney(`${opp.budget || ""} ${opp.description_excerpt || ""}`);
-  if (budget === null || budget < 500) return null;
-  return budget < 1000 ? "$300 fixed first milestone" : "$500 fixed first milestone";
+  if (budget === null || budget < 50) return null;
+  const amount = budget < 500 ? Math.floor(budget) : budget < 1000 ? 300 : 500;
+  return `$${amount} fixed first scope`;
+}
+
+function allowSmallFirstReviewRisk(opp, submitScore) {
+  const budget = opp?.budget_type === "fixed" ? parseMaxMoney(`${opp.budget || ""} ${opp.description_excerpt || ""}`) : null;
+  return budget !== null
+    && budget >= 50
+    && budget < 100
+    && submitScore >= 28
+    && opp.fit_score >= 8
+    && opp.client_quality_score >= 8
+    && opp.competition_score >= 6
+    && opp.scope_clarity_score >= 7;
 }
 
 function isHourlyPackage(pkg) {
@@ -697,10 +711,10 @@ function buildPackage(opp) {
   const pricingRationale = hourly
     ? "Uses the current profile base rate for serious Python, FastAPI, AI, and API work."
     : fixedBid
-      ? "User-authorized fixed-price first milestone amount; the cover letter states this is not a full-project bid."
-      : fixedBudget !== null && fixedBudget < 500
+      ? "Delegated fixed-price first paid scope amount; the cover letter states this is not a full-project bid."
+      : fixedBudget !== null && fixedBudget < 50
         ? "Fixed-price budget is below the automatic submit floor; keep prefill_only."
-        : "Fixed-price budget is unknown or unclear; keep manual review.";
+        : "Fixed-price budget is unknown or unclear; keep prefill_only until the form provides enough pricing fields.";
   return {
     id: `pkg-${jobIdFromUrl(opp.job_url)}`,
     opportunity_id: opp.id,
@@ -709,7 +723,7 @@ function buildPackage(opp) {
     mode,
     max_authorized_connects: maxConnects,
     cover_letter: coverLetter(opp),
-    rate_or_bid: hourly ? "$35/hr" : fixedBid || "manual fixed-price review required",
+    rate_or_bid: hourly ? "$35/hr" : fixedBid || "fixed-price budget below auto-submit floor",
     pricing_rationale: pricingRationale,
     showcase_pack_id: inferCategory(`${opp.title} ${opp.description_excerpt}`),
     screening_answers: [],
@@ -741,7 +755,7 @@ function coverLetter(opp) {
   const pack = inferCategory(`${opp.title} ${opp.description_excerpt}`);
   const fixedBid = fixedFirstMilestoneBid(opp);
   const angle = pack === "rag-chatbot"
-    ? "I can separate ingestion, retrieval, and API behavior so the chatbot is testable from the first milestone."
+    ? "I can separate ingestion, retrieval, and API behavior so the chatbot is testable from the first paid scope."
     : pack === "crm-ai-automation"
       ? "I can build one controlled workflow first, keeping human review where it matters."
       : "I can ship a focused Python/FastAPI implementation with typed inputs, clear endpoints, and practical test coverage.";
@@ -750,10 +764,10 @@ function coverLetter(opp) {
     "",
     `This looks close to the kind of ${opp.skills.includes("FastAPI") ? "FastAPI/Python" : "AI automation"} work I focus on. ${angle}`,
     "",
-    "For a first milestone, I would keep the scope narrow: confirm the inputs, build the core workflow/API path, add basic validation, and leave you with something reviewable instead of a broad unfinished build.",
+    "For a first paid scope, I would keep the work narrow: confirm the inputs, build the core workflow/API path, add basic validation, and leave you with something reviewable instead of a broad unfinished build.",
     "",
     ...(fixedBid ? [
-      `My fixed-price bid is for this small first milestone only (${fixedBid}), not the full project scope.`,
+      `My fixed-price bid is for this small first paid scope only (${fixedBid}), not the full project scope.`,
       "",
     ] : []),
     "A few details I would confirm before starting: the exact first workflow, any existing API/database constraints, and what output would count as accepted for the first delivery.",
@@ -836,11 +850,13 @@ async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
   observation.boost_selected = visibleControls.some((control) => control.checked && /boost|bid/i.test(`${control.label} ${control.name} ${control.id}`));
   if (observation.boost_selected) observation.blockers.push("boost requirement");
   if (/boost your proposal|boosted proposal|bid for boosted/i.test(text)) observation.warnings.push("Boost UI observed; boost not used");
+  const boostFieldsCleared = await clearBoostInputs();
+  if (boostFieldsCleared) observation.filled_fields.push("boost_connects_cleared");
   if (/payment|purchase/i.test(text) && /button/i.test(text)) observation.warnings.push("Payment or purchase wording observed");
   if (/qualification|does not meet/i.test(text)) observation.qualification_warnings.push("qualification wording observed");
   if (/outside upwork|off-platform|telegram|whatsapp|skype/i.test(text)) observation.blockers.push("off-platform communication risk");
   if (/free test|unpaid test|trial task for free/i.test(text)) observation.blockers.push("free test work risk");
-  if (pkg.rate_or_bid.includes("manual fixed-price")) observation.blockers.push("fixed-price bid requires manual review");
+  if (pkg.rate_or_bid.includes("fixed-price budget below")) observation.blockers.push("fixed-price budget below auto-submit floor");
 
   const coverFilled = await fillFirstTextarea(pkg.cover_letter);
   if (coverFilled) observation.filled_fields.push("cover_letter");
@@ -848,10 +864,23 @@ async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
   const hourlyPackage = isHourlyPackage(pkg);
   const hourlyFilled = hourlyPackage ? await fillHourlyRate(pkg.rate_or_bid) : false;
   if (hourlyFilled) observation.filled_fields.push("hourly_rate");
-  const fixedFilled = !hourlyPackage && !pkg.rate_or_bid.includes("manual fixed-price")
+  const fixedByProjectSelected = !hourlyPackage && !pkg.rate_or_bid.includes("fixed-price budget below")
+    ? await selectFixedByProject()
+    : false;
+  if (fixedByProjectSelected) observation.filled_fields.push("fixed_by_project");
+
+  const fixedFilled = !hourlyPackage && !pkg.rate_or_bid.includes("fixed-price budget below")
     ? await fillFixedBid(pkg.rate_or_bid)
     : false;
   if (fixedFilled) observation.filled_fields.push("fixed_first_milestone_bid");
+  const fixedDescriptionFilled = !hourlyPackage && fixedFilled
+    ? await fillFixedMilestoneDescription()
+    : false;
+  if (fixedDescriptionFilled) observation.filled_fields.push("fixed_milestone_description");
+  const fixedDueDateFilled = !hourlyPackage && fixedFilled
+    ? await fillFixedMilestoneDueDate()
+    : false;
+  if (fixedDueDateFilled) observation.filled_fields.push("fixed_milestone_due_date");
 
   const requiredTextareasAfterCover = textareas.slice(1).filter((control) => control.required);
   for (const control of requiredTextareasAfterCover) {
@@ -884,10 +913,20 @@ async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
 
   if (attemptSubmit && observation.safe_to_submit) {
     const clickResult = await clickSubmit();
+    submitAttemptedPackageIds.push(pkg.id);
     actions.push(`${pkg.id}: clicked submit button`);
     await sleep(5000);
     const after = await pageState();
-    if (/proposal sent|proposal submitted|submitted a proposal|successfully submitted|your proposal was submitted/i.test(after.text)) {
+    let finalState = after;
+    if (!submitVerifiedText(after.text) && /yes,? i understand|confirm|are you sure|submit proposal/i.test(after.text)) {
+      const confirmationResult = await clickSubmitConfirmation();
+      if (confirmationResult) {
+        actions.push(`${pkg.id}: ${confirmationResult}`);
+        await sleep(5000);
+        finalState = await pageState();
+      }
+    }
+    if (submitVerifiedText(finalState.text)) {
       submittedPackageIds.push(pkg.id);
       actions.push(`${pkg.id}: submit verified`);
       appendLine("data/connects-ledger.jsonl", {
@@ -914,13 +953,19 @@ async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
         observed_at: now(),
         source_session: SOURCE_SESSION,
       });
-    } else if (/yes, i understand|confirm|are you sure|submit proposal/i.test(after.text)) {
-      observation.blockers.push("post-click confirmation required; not clicked");
+    } else if (/yes,? i understand|confirm|are you sure|submit proposal/i.test(finalState.text)) {
+      observation.blockers.push("post-click confirmation did not resolve");
       observation.safe_to_submit = false;
+      observation.validation_errors.push(`post-submit text: ${sanitizeText(finalState.text, 1200)}`);
+      observation.validation_errors.push(`post-submit controls: ${await visibleControlSummary()}`);
+      observation.validation_errors.push(`post-submit ui: ${await visibleUiSummary()}`);
       warnings.push(`${pkg.id}: ${clickResult}; confirmation or non-terminal state observed`);
     } else {
       observation.blockers.push("submit click did not verify success");
       observation.safe_to_submit = false;
+      observation.validation_errors.push(`post-submit text: ${sanitizeText(finalState.text, 1200)}`);
+      observation.validation_errors.push(`post-submit controls: ${await visibleControlSummary()}`);
+      observation.validation_errors.push(`post-submit ui: ${await visibleUiSummary()}`);
       warnings.push(`${pkg.id}: ${clickResult}; success text not observed`);
     }
   }
@@ -945,6 +990,78 @@ async function fillFirstTextarea(value) {
   return !!result;
 }
 
+async function clearBoostInputs() {
+  const result = await cdp.evaluate(`(() => {
+    let changed = false;
+    const controls = Array.from(document.querySelectorAll('input')).filter((item) => {
+      const rect = item.getBoundingClientRect();
+      const label = [item.id, item.name, item.getAttribute('aria-label'), item.placeholder].filter(Boolean).join(' ');
+      const type = (item.getAttribute('type') || '').toLowerCase();
+      return rect.width > 0
+        && rect.height > 0
+        && !item.disabled
+        && ['number', 'text'].includes(type)
+        && /connect|boost/i.test(label)
+        && !/charged|earned|amount|fee|service|receive/i.test(label);
+    });
+    for (const el of controls) {
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      setter.call(el, '0');
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+      el.dispatchEvent(new Event('blur', { bubbles: true }));
+      changed = true;
+    }
+    return changed;
+  })()`);
+  return !!result;
+}
+
+async function visibleControlSummary() {
+  const raw = await cdp.evaluate(`JSON.stringify(Array.from(document.querySelectorAll('textarea, input, select')).map((el, index) => {
+    const rect = el.getBoundingClientRect();
+    const label = [el.id, el.name, el.getAttribute('aria-label'), el.placeholder].filter(Boolean).join(' ');
+    return {
+      index,
+      tag: el.tagName,
+      type: el.getAttribute('type') || '',
+      label: label.slice(0, 80),
+      value: (el.value || '').slice(0, 120),
+      valid: typeof el.checkValidity === 'function' ? el.checkValidity() : true,
+      validation: (el.validationMessage || '').slice(0, 120),
+      checked: !!el.checked,
+      visible: rect.width > 0 && rect.height > 0
+    };
+  }).filter((item) => item.visible).slice(0, 18))`);
+  return sanitizeText(raw || "[]", 1200);
+}
+
+async function visibleUiSummary() {
+  const raw = await cdp.evaluate(`JSON.stringify([
+    ...Array.from(document.querySelectorAll('button')).map((el, index) => {
+      const rect = el.getBoundingClientRect();
+      return {
+        kind: 'button',
+        index,
+        text: (el.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 100),
+        disabled: !!el.disabled,
+        visible: rect.width > 0 && rect.height > 0
+      };
+    }),
+    ...Array.from(document.querySelectorAll('[role="radio"], [role="checkbox"], [role="switch"]')).map((el, index) => {
+      const rect = el.getBoundingClientRect();
+      return {
+        kind: el.getAttribute('role') || 'role',
+        index,
+        text: (el.textContent || el.getAttribute('aria-label') || '').trim().replace(/\\s+/g, ' ').slice(0, 100),
+        checked: el.getAttribute('aria-checked') || '',
+        visible: rect.width > 0 && rect.height > 0
+      };
+    })
+  ].filter((item) => item.visible).slice(0, 28))`);
+  return sanitizeText(raw || "[]", 1600);
+}
+
 async function fillHourlyRate(rateText) {
   const rate = Number((String(rateText).match(/(\d+(?:\.\d+)?)/) || [])[1] || 35);
   const result = await cdp.evaluate(`(() => {
@@ -963,6 +1080,35 @@ async function fillHourlyRate(rateText) {
   return !!result;
 }
 
+async function selectFixedByProject() {
+  const result = await cdp.evaluate(`(() => {
+    const labels = Array.from(document.querySelectorAll('label'));
+    const label = labels.find((item) => /\\bby project\\b/i.test(item.textContent || ''));
+    if (label) {
+      label.scrollIntoView({ block: 'center', inline: 'center' });
+      label.click();
+      return true;
+    }
+    const controls = Array.from(document.querySelectorAll('input')).filter((item) => {
+      const rect = item.getBoundingClientRect();
+      const labelText = [item.id, item.name, item.value, item.getAttribute('aria-label')].join(' ');
+      const type = (item.getAttribute('type') || '').toLowerCase();
+      return rect.width > 0
+        && rect.height > 0
+        && !item.disabled
+        && type === 'radio'
+        && /project/i.test(labelText);
+    });
+    const control = controls[0];
+    if (!control) return false;
+    control.scrollIntoView({ block: 'center', inline: 'center' });
+    control.click();
+    return true;
+  })()`);
+  if (result) await sleep(500);
+  return !!result;
+}
+
 async function fillFixedBid(rateText) {
   const amount = Number((String(rateText).match(/(\d+(?:\.\d+)?)/) || [])[1] || 0);
   if (!amount) return false;
@@ -970,11 +1116,12 @@ async function fillFixedBid(rateText) {
     const candidates = Array.from(document.querySelectorAll('input')).filter((item) => {
       const rect = item.getBoundingClientRect();
       const label = [item.id, item.name, item.getAttribute('aria-label'), item.placeholder].join(' ');
+      const type = (item.getAttribute('type') || '').toLowerCase();
       return rect.width > 0
         && rect.height > 0
         && !item.disabled
-        && (item.getAttribute('type') || '').toLowerCase() !== 'hidden'
-        && /amount|bid|price|budget|milestone|fixed/i.test(label)
+        && !['hidden', 'radio', 'checkbox', 'button', 'submit'].includes(type)
+        && (/amount|bid|price|budget|fixed/i.test(label) || /\\$\\s*0(?:\\.00)?/.test(label))
         && !/fee|service|receive|connect/i.test(label);
     });
     const el = candidates[0];
@@ -987,6 +1134,104 @@ async function fillFixedBid(rateText) {
     return true;
   })()`);
   return !!result;
+}
+
+async function fillFixedMilestoneDescription() {
+  const value = "First milestone: confirm scope, implement the core workflow/API path, add basic validation, and provide handoff notes.";
+  const result = await cdp.evaluate(`(() => {
+    const value = ${JSON.stringify(value)};
+    const visible = (el) => {
+      const rect = el.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && !el.disabled;
+    };
+    const controls = Array.from(document.querySelectorAll('textarea, input')).filter((item) => {
+      const label = [item.id, item.name, item.getAttribute('aria-label'), item.placeholder].join(' ');
+      const type = (item.getAttribute('type') || '').toLowerCase();
+      return visible(item)
+        && !['hidden', 'radio', 'checkbox', 'button', 'submit'].includes(type)
+        && /description|milestone/i.test(label)
+        && !/cover|letter|connect|amount|price|budget|fee|service|receive/i.test(label);
+    });
+    const el = controls[0];
+    if (!el) return false;
+    const proto = el.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype;
+    const setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
+    setter.call(el, value);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+    el.dispatchEvent(new Event('blur', { bubbles: true }));
+    return true;
+  })()`);
+  return !!result;
+}
+
+function fixedMilestoneDueDate() {
+  const date = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  return {
+    iso: `${yyyy}-${mm}-${dd}`,
+    us: `${mm}/${dd}/${yyyy}`,
+    day: String(date.getDate()),
+  };
+}
+
+async function fillFixedMilestoneDueDate() {
+  const target = fixedMilestoneDueDate();
+  const direct = await cdp.evaluate(`(() => {
+    const values = [${JSON.stringify(target.iso)}, ${JSON.stringify(target.us)}];
+    const candidates = Array.from(document.querySelectorAll('input')).filter((item) => {
+      const rect = item.getBoundingClientRect();
+      const label = [item.id, item.name, item.getAttribute('aria-label'), item.placeholder].join(' ');
+      const type = (item.getAttribute('type') || '').toLowerCase();
+      return rect.width > 0
+        && rect.height > 0
+        && !item.disabled
+        && !['hidden', 'radio', 'checkbox', 'button', 'submit'].includes(type)
+        && /date|due|deadline/i.test(label);
+    });
+    for (const el of candidates) {
+      const proto = window.HTMLInputElement.prototype;
+      const setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
+      for (const value of values) {
+        setter.call(el, value);
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+        if ((el.value || '').trim()) return true;
+      }
+    }
+    return false;
+  })()`);
+  if (direct) return true;
+
+  const opened = await cdp.evaluate(`(() => {
+    const button = Array.from(document.querySelectorAll('button')).find((item) => {
+      const text = (item.textContent || '').trim();
+      const rect = item.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && /choose date|select date|due date/i.test(text) && !item.disabled;
+    });
+    if (!button) return false;
+    button.scrollIntoView({ block: 'center', inline: 'center' });
+    button.click();
+    return true;
+  })()`);
+  if (!opened) return false;
+  await sleep(800);
+  const selected = await cdp.evaluate(`(() => {
+    const targetDay = ${JSON.stringify(target.day)};
+    const buttons = Array.from(document.querySelectorAll('button')).filter((item) => {
+      const text = (item.textContent || '').trim();
+      const rect = item.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0 && text === targetDay && !item.disabled;
+    });
+    const button = buttons[0];
+    if (!button) return false;
+    button.click();
+    return true;
+  })()`);
+  return !!selected;
 }
 
 async function getSubmitInfo() {
@@ -1003,16 +1248,65 @@ async function getSubmitInfo() {
 }
 
 async function clickSubmit() {
-  return await cdp.evaluate(`(() => {
+  const raw = await cdp.evaluate(`JSON.stringify((() => {
     const button = Array.from(document.querySelectorAll('button')).find((item) => {
       const text = (item.textContent || '').trim();
       const rect = item.getBoundingClientRect();
       return rect.width > 0 && rect.height > 0 && /send proposal|submit proposal|send for \\d+\\s+connects|submit/i.test(text) && !/buy|purchase|boost/i.test(text) && !item.disabled;
     });
-    if (!button) return 'submit button not found';
-    button.click();
-    return 'clicked ' + button.textContent.trim();
-  })()`);
+    if (!button) return null;
+    button.scrollIntoView({ block: 'center', inline: 'center' });
+    const rect = button.getBoundingClientRect();
+    return {
+      text: button.textContent.trim(),
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+  })())`);
+  const button = JSON.parse(raw || "null");
+  if (!button) return "submit button not found";
+  await cdp.send("Input.dispatchMouseEvent", { type: "mouseMoved", x: button.x, y: button.y });
+  await sleep(100);
+  await cdp.send("Input.dispatchMouseEvent", { type: "mousePressed", x: button.x, y: button.y, button: "left", clickCount: 1 });
+  await sleep(120);
+  await cdp.send("Input.dispatchMouseEvent", { type: "mouseReleased", x: button.x, y: button.y, button: "left", clickCount: 1 });
+  return `clicked ${button.text}`;
+}
+
+function submitVerifiedText(text) {
+  return /proposal sent|proposal submitted|submitted a proposal|successfully submitted|your proposal was submitted|withdraw proposal|view proposal/i.test(String(text || ""));
+}
+
+async function clickSubmitConfirmation() {
+  const raw = await cdp.evaluate(`JSON.stringify((() => {
+    const body = document.body && document.body.innerText || '';
+    if (!/yes,? i understand|confirm|are you sure|submit proposal/i.test(body)) return null;
+    const button = Array.from(document.querySelectorAll('button')).find((item) => {
+      const text = (item.textContent || '').trim();
+      const rect = item.getBoundingClientRect();
+      return rect.width > 0
+        && rect.height > 0
+        && /yes,? i understand|confirm|submit proposal|send proposal/i.test(text)
+        && !/buy|purchase|boost/i.test(text)
+        && !item.disabled;
+    });
+    if (!button) return null;
+    button.scrollIntoView({ block: 'center', inline: 'center' });
+    const rect = button.getBoundingClientRect();
+    return {
+      text: button.textContent.trim(),
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2
+    };
+  })())`);
+  const button = JSON.parse(raw || "null");
+  if (!button) return "";
+  await cdp.send("Input.dispatchMouseEvent", { type: "mouseMoved", x: button.x, y: button.y });
+  await sleep(100);
+  await cdp.send("Input.dispatchMouseEvent", { type: "mousePressed", x: button.x, y: button.y, button: "left", clickCount: 1 });
+  await sleep(120);
+  await cdp.send("Input.dispatchMouseEvent", { type: "mouseReleased", x: button.x, y: button.y, button: "left", clickCount: 1 });
+  return `clicked confirmation ${button.text}`;
 }
 
 function authorizeAfterInspection(packages, observations, opportunitiesById) {
@@ -1034,7 +1328,7 @@ function authorizeAfterInspection(packages, observations, opportunitiesById) {
     if (opportunity && opportunity.scope_clarity_score < 7) gateBlockers.push("scope clarity below submit threshold");
     if (opportunity && opportunity.client_quality_score < 5) gateBlockers.push("client quality below submit threshold");
     if (opportunity && opportunity.competition_score < 5) gateBlockers.push("competition below submit threshold");
-    if (opportunity && opportunity.risk_score > 4) gateBlockers.push("risk score above submit threshold");
+    if (opportunity && opportunity.risk_score > 4 && !allowSmallFirstReviewRisk(opportunity, submitScore)) gateBlockers.push("risk score above submit threshold");
     if (submitScore !== null && submitScore < 28) gateBlockers.push("submit score below threshold");
     if (gateBlockers.length === 0 && authorizedCount >= MAX_SUBMISSIONS) {
       gateBlockers.push("submission limit reached");
@@ -1048,7 +1342,7 @@ function authorizeAfterInspection(packages, observations, opportunitiesById) {
     if (gateBlockers.length === 0 && plannedSpend + observation.connects_cost > observation.connects_balance_observed) {
       gateBlockers.push("planned Connects spend exceeds observed balance");
     }
-    if (gateBlockers.length === 0 && plannedSpend + observation.connects_cost > observation.connects_balance_observed - ACTIVE_PLAN.reserve_floor) {
+    if (gateBlockers.length === 0 && ACTIVE_PLAN.reserve_floor > 0 && plannedSpend + observation.connects_cost > observation.connects_balance_observed - ACTIVE_PLAN.reserve_floor) {
       gateBlockers.push("planned Connects spend would breach reserve floor");
     }
 
@@ -1114,8 +1408,9 @@ function observedConnectsBalance(observations) {
 
 function packageState(pkg, observation) {
   if (submittedPackageIds.includes(pkg.id)) return "submitted";
-  if (pkg.mode === "submit_authorized") return "submit_authorized";
   const text = (observation?.blockers || []).join("; ");
+  if (/submit click did not verify|post-click confirmation did not resolve/i.test(text)) return "error";
+  if (pkg.mode === "submit_authorized") return "submit_authorized";
   if (/manual review|unknown required fields|confirmation required|qualification/i.test(text)) return "manual_review_required";
   return "tracked_not_submitted";
 }
@@ -1140,8 +1435,8 @@ function classifyRunResult({ packages, observations }) {
 function nextActionForResult(result) {
   if (result === "submitted") return "Monitor submitted proposals and client messages.";
   if (result === "no_submission_quality_gate") return "Collect more recent opportunities under the active L3 plan; current candidates did not meet submit score gates.";
-  if (result === "connects_insufficient") return "Preserve reserve floor and wait for enough Connects or user-approved budget change.";
-  if (result === "manual_review_required") return "Review the tracked packages with manual fields or fixed-price gates before submit.";
+  if (result === "connects_insufficient") return "Spend available Connects only when the form cost is visible; do not buy Connects.";
+  if (result === "manual_review_required") return "Resolve only concrete form blockers such as unknown required fields or qualification warnings.";
   if (result === "platform_blocked") return "Resolve the live platform blocker, then rerun the bounded Raw CDP cycle.";
   return "Debug the runtime error before rerunning.";
 }
@@ -1356,7 +1651,7 @@ ${actions.map((item) => `- ${item}`).join("\n")}
 ## Submit Status
 
 - Mode: ${MODE}
-- Submit attempted: ${submittedPackageIds.length ? "yes" : "no"}
+- Submit attempted: ${submitAttemptedPackageIds.length ? `yes (${submitAttemptedPackageIds.join(", ")})` : "no"}
 - Submit result: ${submitted}
 
 ## Message Status
@@ -1514,6 +1809,7 @@ async function main() {
     actions_taken: actions,
     files_changed: runOutputFiles(),
     result,
+    submit_attempted: submitAttemptedPackageIds,
     blockers: blockers.length ? blockers : observations.flatMap((obs) => obs.blockers),
     summary_metrics: summaryMetrics,
   });
