@@ -331,20 +331,13 @@ class CDP {
 }
 
 async function ensureCdp() {
-  try {
-    const version = await fetch(`${CDP_HTTP}/json/version`);
-    if (version.ok) {
-      actions.push("reused Chrome CDP at 127.0.0.1:9222");
-      return;
-    }
-  } catch {
-    // launch below
+  if (await isCdpReachable()) {
+    actions.push("reused Chrome CDP at 127.0.0.1:9222");
+    return;
   }
 
-  const chrome = [
-    "C:/Program Files/Google/Chrome/Application/chrome.exe",
-    "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
-  ].find((file) => fs.existsSync(file));
+  actions.push("Chrome CDP not reachable at 127.0.0.1:9222; launching Chrome with remote debugging");
+  const chrome = findChromeExecutable();
   if (!chrome) throw new Error("Chrome executable not found");
 
   const profile = path.join(process.env.LOCALAPPDATA || "", "Chrome-CDP-Profile");
@@ -365,17 +358,39 @@ async function ensureCdp() {
 
   for (let i = 0; i < 30; i++) {
     await sleep(1000);
-    try {
-      const version = await fetch(`${CDP_HTTP}/json/version`);
-      if (version.ok) {
-        actions.push("started Chrome CDP at 127.0.0.1:9222");
-        return;
-      }
-    } catch {
-      // retry
+    if (await isCdpReachable()) {
+      actions.push("started Chrome CDP at 127.0.0.1:9222");
+      return;
     }
   }
   throw new Error("Chrome CDP did not start");
+}
+
+async function isCdpReachable() {
+  try {
+    const version = await fetch(`${CDP_HTTP}/json/version`, {
+      signal: AbortSignal.timeout(2500),
+    });
+    return version.ok;
+  } catch {
+    return false;
+  }
+}
+
+function findChromeExecutable() {
+  const candidates = [
+    path.join(process.env.PROGRAMFILES || "C:/Program Files", "Google/Chrome/Application/chrome.exe"),
+    path.join(process.env["PROGRAMFILES(X86)"] || "C:/Program Files (x86)", "Google/Chrome/Application/chrome.exe"),
+    path.join(process.env.LOCALAPPDATA || "", "Google/Chrome/Application/chrome.exe"),
+  ];
+  const where = spawnSync("where.exe", ["chrome"], {
+    encoding: "utf8",
+    windowsHide: true,
+  });
+  if (where.status === 0) {
+    candidates.push(...String(where.stdout || "").split(/\r?\n/).filter(Boolean));
+  }
+  return [...new Set(candidates)].find((file) => file && fs.existsSync(file));
 }
 
 async function connectCdp() {

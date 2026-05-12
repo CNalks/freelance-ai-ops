@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { spawn, spawnSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const ROOT = process.cwd();
@@ -105,8 +106,7 @@ class CDP {
 }
 
 async function getCdp() {
-  const version = await fetch(`${CDP_HTTP}/json/version`);
-  if (!version.ok) throw new Error("Chrome CDP is not reachable at 127.0.0.1:9222");
+  await ensureCdp();
   const tabs = await (await fetch(`${CDP_HTTP}/json`)).json();
   let tab = tabs.find((t) => t.type === "page" && t.webSocketDebuggerUrl && /upwork/i.test(t.url || ""));
   tab ||= tabs.find((t) => t.type === "page" && t.webSocketDebuggerUrl);
@@ -117,6 +117,62 @@ async function getCdp() {
   const cdp = new CDP(tab.webSocketDebuggerUrl);
   await cdp.connect();
   return cdp;
+}
+
+async function ensureCdp() {
+  if (await isCdpReachable()) return;
+
+  const chrome = findChromeExecutable();
+  if (!chrome) throw new Error("Chrome executable not found");
+
+  const profile = path.join(process.env.LOCALAPPDATA || "", "Chrome-CDP-Profile");
+  fs.mkdirSync(profile, { recursive: true });
+  const child = spawn(chrome, [
+    "--remote-debugging-port=9222",
+    `--user-data-dir=${profile}`,
+    "--remote-allow-origins=*",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "https://www.upwork.com",
+  ], {
+    detached: true,
+    stdio: "ignore",
+    windowsHide: true,
+  });
+  child.unref();
+
+  for (let i = 0; i < 30; i++) {
+    await sleep(1000);
+    if (await isCdpReachable()) return;
+  }
+  throw new Error("Chrome CDP did not start at 127.0.0.1:9222");
+}
+
+async function isCdpReachable() {
+  try {
+    const version = await fetch(`${CDP_HTTP}/json/version`, {
+      signal: AbortSignal.timeout(2500),
+    });
+    return version.ok;
+  } catch {
+    return false;
+  }
+}
+
+function findChromeExecutable() {
+  const candidates = [
+    path.join(process.env.PROGRAMFILES || "C:/Program Files", "Google/Chrome/Application/chrome.exe"),
+    path.join(process.env["PROGRAMFILES(X86)"] || "C:/Program Files (x86)", "Google/Chrome/Application/chrome.exe"),
+    path.join(process.env.LOCALAPPDATA || "", "Google/Chrome/Application/chrome.exe"),
+  ];
+  const where = spawnSync("where.exe", ["chrome"], {
+    encoding: "utf8",
+    windowsHide: true,
+  });
+  if (where.status === 0) {
+    candidates.push(...String(where.stdout || "").split(/\r?\n/).filter(Boolean));
+  }
+  return [...new Set(candidates)].find((file) => file && fs.existsSync(file));
 }
 
 function read(rel) {
