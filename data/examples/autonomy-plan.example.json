@@ -1,0 +1,36 @@
+{
+  "id": "autonomy-plan-example-001",
+  "run_id": null,
+  "status": "active",
+  "autonomy_level": "L3",
+  "execution_channel": "raw_cdp_humanlike",
+  "daily_connects_cap": 15,
+  "weekly_connects_cap": 45,
+  "reserve_floor": 10,
+  "target_categories": [
+    "fastapi-llm-backend",
+    "rag-chatbot",
+    "crm-ai-automation"
+  ],
+  "active_offer_ids": [
+    "fastapi-llm-backend",
+    "rag-chatbot"
+  ],
+  "allowed_actions": [
+    "search_jobs",
+    "inspect_forms",
+    "submit_authorized_packages",
+    "monitor_messages",
+    "send_authorized_messages"
+  ],
+  "volume_limits": {
+    "search_sources": 3,
+    "job_pages": 20,
+    "proposal_forms": 5,
+    "proposal_submits": 3,
+    "message_threads": 10,
+    "message_sends": 5
+  },
+  "expires_at": "2026-05-11T00:00:00Z",
+  "created_at": "2026-05-10T00:00:00Z"
+}

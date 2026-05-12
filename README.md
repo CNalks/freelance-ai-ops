@@ -1,60 +1,47 @@
 # Freelance AI Ops
 
-AI-assisted freelancing workflow for Upwork. This repo is the single source of truth for the profile, proposal templates, portfolio demos, job leads, proposal drafts, automation scripts, and active client projects.
+AI-assisted Upwork acquisition operating system. This repo stores strategy, platform rules, autonomy policy, task workflows, proposal packages, product assets, and audit records.
 
-## Acquisition OS Entry Points
+## Start Here
 
-1. Read `docs/acquisition-os-architecture.md`
-2. Set policy in `docs/connects-policy.md`
-3. Use `task/plan-daily-acquisition.md`
-4. Build proposal packages
-5. Execute only authorized CDP actions
-6. Review sessions and audit policy patches
+1. `docs/automation-workflows.md` - recurring automation README and usage guide.
+2. `docs/upwork-platform-rules.md` - platform boundary summary.
+3. `docs/autonomous-ops-policy.md` - autonomy levels, Raw CDP channel, and operating mandate.
+4. `docs/authorization-policy.md` - submit/message gates.
+5. `docs/connects-policy.md` - Connects budget, reserve, and ledger rules.
+6. `task/run-autonomous-acquisition-cycle.md` - primary daily acquisition task.
 
-## What This Repo Contains
+## Important Paths
 
 | Path | Purpose |
-|------|---------|
-| `profile/` | Upwork profile draft, proposal templates, and client communication templates |
-| `portfolio/` | Demo projects for AI/LLM, FastAPI backend, RAG, and dashboard work |
-| `automation/` | Browser automation and helper scripts |
-| `docs/` | Workflow, pricing, progress, job leads, proposal drafts, and tracker files |
-| `projects/` | One folder per accepted client project |
-| `task/` | Codex task specs used to run repeatable workflows |
+|---|---|
+| `task/` | Repeatable task specs for the scheduled workflows. |
+| `docs/` | Operating policies, workflow docs, pricing, reports, and trackers. |
+| `data/*.jsonl` | Structured state for plans, jobs, packages, actions, ledgers, runs, and outcomes. |
+| `data/schemas/` | JSON schemas used by `tools/validate_data_schemas.mjs`. |
+| `sessions/` | Required audit trail for every live Raw CDP execution. |
+| `profile/` | Upwork profile notes, proposal templates, client templates, and showcase catalog. |
+| `portfolio/` | Real demo assets used as proposal proof. |
+| `tools/` | Raw CDP runner and data validation tools. |
 
-## Daily Workflow
+## Automation Workflows
 
-1. Search recent Upwork jobs with the Raw CDP scraper.
-2. Review `docs/job-leads.md` and prioritize high-fit jobs.
-3. Draft or refine proposals in `docs/proposal-drafts.md`.
-4. Pre-fill proposal forms through Raw CDP and review manually before submit.
-5. Track proposal status in `docs/proposal-tracker.md`.
-6. When a contract is won, create a project folder under `projects/`.
+The installed workflow set is:
 
-## Job Search
+- `upwork-daily-acquisition` - find, score, package, inspect, and submit only concrete `submit_authorized` packages.
+- `upwork-monitor-comms` - monitor proposals/messages and send only concrete `message_send_authorized` replies.
+- `upwork-connects-governance` - track reserve, balance, and legitimate free-Connects earning paths.
+- `upwork-product-assets` - improve productized offers and proof assets.
+- `upwork-weekly-audit` - review results, classify blockers, propose policy patches, and renew expiring autonomy plans.
 
-Chrome must be running with CDP on port `9222`.
+Live workflows require Chrome logged in to Upwork with Raw CDP available at `127.0.0.1:9222`. Buying Connects, boosting, accepting/declining contracts, purchases, subscriptions, and off-platform conversion remain forbidden unless the policy explicitly says the user must do it manually.
 
-```bash
-python C:\Users\a8744\Desktop\for-codex\Upwork\automation\upwork-cdp-scraper\scrape_jobs.py --output docs/job-leads.md
+## Manual Verification
+
+```powershell
+node tools/validate_data_schemas.mjs
+Push-Location automation/upwork-browser; npm exec -- tsc --noEmit; Pop-Location
+Push-Location portfolio/demo-fastapi-llm; python -m pytest tests; Pop-Location
+node --check tools/acquisition_os_live_test.mjs
+node tools/acquisition_os_live_test.mjs --no-submit
 ```
-
-Or give Codex the task file:
-
-```text
-task/codex-task-job-search-v2.md
-```
-
-## Key Docs
-
-- `docs/workflow.md` - operating workflow
-- `docs/pricing.md` - pricing strategy
-- `docs/progress.md` - current status
-- `docs/job-leads.md` - latest job search results
-- `docs/proposal-drafts.md` - proposal drafts for review
-
-## Portfolio
-
-- `portfolio/demo-rag-chatbot/` - FastAPI RAG chatbot with LangChain, OpenAI API, and ChromaDB
-- `portfolio/demo-fastapi-llm/` - FastAPI LLM backend with completions, streaming, extraction, and summarization
-- `portfolio/demo-dashboard/` - static AI Ops dashboard with Tailwind CSS and Chart.js

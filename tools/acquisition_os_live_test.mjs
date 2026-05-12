@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const ROOT = process.cwd();
@@ -15,9 +15,15 @@ const RUN_STAMP = new Date().toISOString().replace(/[:.]/g, "-");
 const RUN_ID = `run-${RUN_DATE}-acquisition-os-live-test-${RUN_STAMP}`;
 const SESSION_FILE = `sessions/${RUN_DATE}-acquisition-os-live-test-${RUN_STAMP}.md`;
 const SOURCE_SESSION = SESSION_FILE;
-const MODE = "delegated_submit_run";
-const INSPECT_LIMIT = 5;
-const MAX_SUBMISSIONS = 3;
+const NO_SUBMIT = process.argv.includes("--no-submit") || process.env.NO_SUBMIT === "1";
+const GIT_CLOSEOUT = process.argv.includes("--git-closeout") || process.env.GIT_CLOSEOUT === "1";
+const MODE = NO_SUBMIT ? "delegated_submit_no_submit_smoke" : "delegated_submit_run";
+const EXECUTION_CHANNEL = "raw_cdp_humanlike";
+const POLICY_VERSION = "2026-05-10-autonomous-ops";
+const ACTIVE_PLAN = loadActiveAutonomyPlan();
+const AUTONOMY_LEVEL = NO_SUBMIT ? "L1" : ACTIVE_PLAN.autonomy_level;
+const INSPECT_LIMIT = ACTIVE_PLAN.volume_limits.proposal_forms;
+const MAX_SUBMISSIONS = ACTIVE_PLAN.volume_limits.proposal_submits;
 
 const SEARCH_URLS = [
   ["best-matches", "https://www.upwork.com/nx/find-work/best-matches"],
@@ -30,6 +36,7 @@ const actions = [];
 const blockers = [];
 const warnings = [];
 const submittedPackageIds = [];
+let candidateCardsCollected = 0;
 let cdp;
 let runStartedAt = now();
 
@@ -73,6 +80,35 @@ function readJsonl(rel) {
     .map((line) => JSON.parse(line));
 }
 
+function runCommand(command, args) {
+  const result = spawnSync(command, args, {
+    cwd: ROOT,
+    encoding: "utf8",
+    windowsHide: true,
+  });
+  if (result.status !== 0) {
+    const output = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
+    throw new Error(`${command} ${args.join(" ")} failed${output ? `: ${output}` : ""}`);
+  }
+  return String(result.stdout || "").trim();
+}
+
+function loadActiveAutonomyPlan() {
+  const plans = readJsonl("data/autonomy-plans.jsonl");
+  const activePlans = plans.filter((plan) => plan.status === "active");
+  if (!activePlans.length) throw new Error("No active autonomy plan found in data/autonomy-plans.jsonl");
+
+  const plan = activePlans.at(-1);
+  if (plan.execution_channel !== EXECUTION_CHANNEL) {
+    throw new Error(`Active autonomy plan requires ${plan.execution_channel}, not ${EXECUTION_CHANNEL}`);
+  }
+  if (Date.parse(plan.expires_at) <= Date.now()) {
+    throw new Error(`Active autonomy plan expired at ${plan.expires_at}`);
+  }
+
+  return plan;
+}
+
 function writeJsonl(rel, rows) {
   const text = rows.map((row) => JSON.stringify(row)).join("\n");
   writeText(rel, text ? `${text}\n` : "");
@@ -104,6 +140,31 @@ function slug(text) {
 
 function jobIdFromUrl(url) {
   return (String(url).match(/~0?(\d{12,})/) || [])[1] || slug(url);
+}
+
+function budgetSnapshot(connectsBalanceObserved = null) {
+  return {
+    operating_mandate_id: ACTIVE_PLAN.id,
+    daily_connects_cap: ACTIVE_PLAN.daily_connects_cap,
+    weekly_connects_cap: ACTIVE_PLAN.weekly_connects_cap,
+    reserve_floor: ACTIVE_PLAN.reserve_floor,
+    connects_balance_observed: connectsBalanceObserved,
+  };
+}
+
+function runOutputFiles() {
+  return [
+    "data/jobs.jsonl",
+    "data/proposal-packages.jsonl",
+    "data/connects-ledger.jsonl",
+    "data/form-observations.jsonl",
+    "data/outcomes.jsonl",
+    "data/policy-patches.jsonl",
+    "data/platform-actions.jsonl",
+    "data/bid-tracker.jsonl",
+    "data/runs.jsonl",
+    SESSION_FILE,
+  ];
 }
 
 function jobTokenFromUrl(url) {
@@ -158,6 +219,26 @@ function parseConnectsBalance(text) {
     if (match) return Number(match[1]);
   }
   return null;
+}
+
+function connectsSpendWindow() {
+  const rows = fs.existsSync(abs("data/connects-ledger.jsonl")) ? readJsonl("data/connects-ledger.jsonl") : [];
+  const runDateMs = Date.parse(`${RUN_DATE}T00:00:00Z`);
+  const weekStartMs = runDateMs - (6 * 24 * 60 * 60 * 1000);
+  let daily = 0;
+  let weekly = 0;
+
+  for (const row of rows) {
+    if (row.event_type !== "spend" || row.connects_delta >= 0) continue;
+    const spend = Math.abs(row.connects_delta);
+    if (row.date === RUN_DATE) daily += spend;
+    const rowDateMs = Date.parse(`${row.date}T00:00:00Z`);
+    if (Number.isFinite(rowDateMs) && rowDateMs >= weekStartMs && rowDateMs <= runDateMs) {
+      weekly += spend;
+    }
+  }
+
+  return { daily, weekly };
 }
 
 function uniqueBy(rows, keyFn) {
@@ -497,7 +578,7 @@ async function enrichOpportunity(opp) {
 
 async function collectOpportunities() {
   const collected = [];
-  for (const [source, url] of SEARCH_URLS) {
+  for (const [source, url] of SEARCH_URLS.slice(0, ACTIVE_PLAN.volume_limits.search_sources)) {
     let state = null;
     let blocker = null;
     for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -520,6 +601,7 @@ async function collectOpportunities() {
       continue;
     }
     const cards = await extractJobCards(source);
+    candidateCardsCollected += cards.length;
     actions.push(`collected ${cards.length} candidate cards from ${source}`);
     collected.push(...cards);
   }
@@ -552,6 +634,7 @@ function scoreOpportunity(opp) {
   if (freeTest) risk += 5;
   if (!opp.payment_verified) risk += 1;
   risk = Math.min(10, risk);
+  const submitScore = fit + client + competition + clarity - risk;
 
   const expected = fit >= 8 && client >= 6 && competition >= 6 && clarity >= 6 && risk <= 4 ? "high" : fit >= 6 && risk <= 6 ? "medium" : "low";
   let action = "draft_only";
@@ -573,6 +656,17 @@ function scoreOpportunity(opp) {
     competition_score: competition,
     scope_clarity_score: clarity,
     risk_score: risk,
+    submit_score: submitScore,
+    freshness_score: /hour|minute|today/i.test(opp.posted_at_text || "") ? 8 : /yesterday/i.test(opp.posted_at_text || "") ? 5 : 2,
+    review_potential_score: client >= 6 && competition >= 6 ? 7 : 4,
+    first_contract_probability: Math.max(0, Math.min(10, Math.round((fit + client + competition + clarity - risk) / 4))),
+    portfolio_value_score: fit >= 8 ? 7 : 4,
+    client_risk_markers: [
+      ...(offPlatform ? ["off_platform_contact"] : []),
+      ...(freeTest ? ["free_test_work"] : []),
+      ...(budgetAmount !== null && budgetAmount < 500 ? ["low_fixed_budget"] : []),
+    ],
+    submit_candidate_reason: action === "prefill_only" ? reason : "",
     expected_value_band: expected,
     recommended_action: action,
     decision_reason: reason,
@@ -595,6 +689,7 @@ function buildPackage(opp) {
   return {
     id: `pkg-${jobIdFromUrl(opp.job_url)}`,
     opportunity_id: opp.id,
+    job_id: jobIdFromUrl(opp.job_url),
     job_url: opp.job_url,
     mode,
     max_authorized_connects: maxConnects,
@@ -603,7 +698,7 @@ function buildPackage(opp) {
     pricing_rationale: pricingRationale,
     showcase_pack_id: inferCategory(`${opp.title} ${opp.description_excerpt}`),
     screening_answers: [],
-    risk_notes: `Scores: fit ${opp.fit_score}, client ${opp.client_quality_score}, competition ${opp.competition_score}, clarity ${opp.scope_clarity_score}, risk ${opp.risk_score}. ${opp.decision_reason}`,
+    risk_notes: `Scores: fit ${opp.fit_score}, client ${opp.client_quality_score}, competition ${opp.competition_score}, clarity ${opp.scope_clarity_score}, risk ${opp.risk_score}, submit ${opp.submit_score}. ${opp.decision_reason}`,
     stop_conditions: [
       "unknown required fields",
       "Buy Connects wall",
@@ -613,6 +708,16 @@ function buildPackage(opp) {
       "free test work",
       "connects cost above authorized package max",
     ],
+    autonomy_level: AUTONOMY_LEVEL,
+    execution_channel: EXECUTION_CHANNEL,
+    operating_mandate_id: ACTIVE_PLAN.id,
+    authorization_reason: mode === "prefill_only" ? "Selected for bounded Raw CDP form inspection." : "Draft only.",
+    reserve_floor_after_spend: null,
+    authorization_expires_at: `${RUN_DATE}T23:59:59Z`,
+    platform_channel_required: EXECUTION_CHANNEL,
+    product_offer_id: inferCategory(`${opp.title} ${opp.description_excerpt}`),
+    asset_readiness: "ready",
+    message_followup_policy: "Draft replies into message packages; send only with message_send_authorized.",
     created_at: now(),
   };
 }
@@ -654,6 +759,11 @@ async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
     optional_fields: [],
     unknown_required_fields: [],
     warnings: [],
+    submit_button_seen: false,
+    boost_selected: false,
+    purchase_ui_seen: false,
+    qualification_warnings: [],
+    validation_errors: [],
     filled_fields: [],
     safe_to_submit: false,
     blockers: [],
@@ -706,10 +816,13 @@ async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
   if (observation.connects_cost !== null && pkg.max_authorized_connects > 0 && observation.connects_cost > pkg.max_authorized_connects) observation.blockers.push("Connects cost exceeds authorization");
   if (balance !== null && observation.connects_cost !== null && observation.connects_cost > balance) observation.blockers.push("Connects cost exceeds observed balance");
   if (/buy connects|purchase connects/i.test(text)) observation.blockers.push("Buy Connects wall");
-  if ((before.buttons || []).some((button) => button.visible && /buy|purchase/i.test(button.text))) observation.blockers.push("payment or purchase button");
-  if (visibleControls.some((control) => control.checked && /boost|bid/i.test(`${control.label} ${control.name} ${control.id}`))) observation.blockers.push("boost requirement");
+  observation.purchase_ui_seen = (before.buttons || []).some((button) => button.visible && /buy|purchase/i.test(button.text));
+  if (observation.purchase_ui_seen) observation.blockers.push("payment or purchase button");
+  observation.boost_selected = visibleControls.some((control) => control.checked && /boost|bid/i.test(`${control.label} ${control.name} ${control.id}`));
+  if (observation.boost_selected) observation.blockers.push("boost requirement");
   if (/boost your proposal|boosted proposal|bid for boosted/i.test(text)) observation.warnings.push("Boost UI observed; boost not used");
   if (/payment|purchase/i.test(text) && /button/i.test(text)) observation.warnings.push("Payment or purchase wording observed");
+  if (/qualification|does not meet/i.test(text)) observation.qualification_warnings.push("qualification wording observed");
   if (/outside upwork|off-platform|telegram|whatsapp|skype/i.test(text)) observation.blockers.push("off-platform communication risk");
   if (/free test|unpaid test|trial task for free/i.test(text)) observation.blockers.push("free test work risk");
   if (pkg.rate_or_bid.includes("manual fixed-price")) observation.blockers.push("fixed-price bid requires manual review");
@@ -745,8 +858,12 @@ async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
   if (observation.unknown_required_fields.length) observation.blockers.push("unknown required fields");
 
   const submitInfo = await getSubmitInfo();
+  observation.submit_button_seen = submitInfo.hasSubmitButton;
   if (!submitInfo.hasSubmitButton) observation.blockers.push("submit button not found");
-  if (submitInfo.submitDisabled) observation.blockers.push("submit button disabled");
+  if (submitInfo.submitDisabled) {
+    observation.blockers.push("submit button disabled");
+    observation.validation_errors.push("submit button disabled");
+  }
   if (attemptSubmit && pkg.mode !== "submit_authorized") observation.blockers.push(`mode is ${pkg.mode}`);
   observation.safe_to_submit = observation.blockers.length === 0 && submitInfo.hasSubmitButton && !submitInfo.submitDisabled;
 
@@ -762,6 +879,10 @@ async function inspectAndMaybeSubmit(pkg, { attemptSubmit = false } = {}) {
         id: `connects-${pkg.id}-${RUN_STAMP}`,
         date: RUN_DATE,
         event_type: "spend",
+        budget_scope: "active_autonomy_plan",
+        reserve_floor: ACTIVE_PLAN.reserve_floor,
+        weekly_cap: ACTIVE_PLAN.weekly_connects_cap,
+        daily_cap: ACTIVE_PLAN.daily_connects_cap,
         opportunity_id: pkg.opportunity_id,
         proposal_package_id: pkg.id,
         connects_delta: -observation.connects_cost,
@@ -881,6 +1002,7 @@ async function clickSubmit() {
 
 function authorizeAfterInspection(packages, observations, opportunitiesById) {
   const observationsByPackage = new Map(observations.map((obs) => [obs.proposal_package_id, obs]));
+  const priorSpend = connectsSpendWindow();
   let plannedSpend = 0;
   let authorizedCount = 0;
 
@@ -890,24 +1012,51 @@ function authorizeAfterInspection(packages, observations, opportunitiesById) {
     if (!observation) continue;
     const opportunity = opportunitiesById.get(pkg.opportunity_id);
     const gateBlockers = [...new Set(observation.blockers)];
+    const submitScore = opportunity?.submit_score ?? null;
 
-    if (!opportunity || opportunity.expected_value_band !== "high") gateBlockers.push("expected value is not high enough for submit");
-    if (opportunity && opportunity.client_quality_score < 6) gateBlockers.push("client quality below submit threshold");
-    if (opportunity && opportunity.competition_score < 6) gateBlockers.push("competition below submit threshold");
-    if (opportunity && opportunity.scope_clarity_score < 6) gateBlockers.push("scope clarity below submit threshold");
+    if (!opportunity) gateBlockers.push("opportunity record missing");
+    if (opportunity && opportunity.fit_score < 8) gateBlockers.push("fit below submit threshold");
+    if (opportunity && opportunity.scope_clarity_score < 7) gateBlockers.push("scope clarity below submit threshold");
+    if (opportunity && opportunity.client_quality_score < 5) gateBlockers.push("client quality below submit threshold");
+    if (opportunity && opportunity.competition_score < 5) gateBlockers.push("competition below submit threshold");
     if (opportunity && opportunity.risk_score > 4) gateBlockers.push("risk score above submit threshold");
+    if (submitScore !== null && submitScore < 28) gateBlockers.push("submit score below threshold");
     if (gateBlockers.length === 0 && authorizedCount >= MAX_SUBMISSIONS) {
       gateBlockers.push("submission limit reached");
+    }
+    if (gateBlockers.length === 0 && priorSpend.daily + plannedSpend + observation.connects_cost > ACTIVE_PLAN.daily_connects_cap) {
+      gateBlockers.push("daily Connects cap would be exceeded");
+    }
+    if (gateBlockers.length === 0 && priorSpend.weekly + plannedSpend + observation.connects_cost > ACTIVE_PLAN.weekly_connects_cap) {
+      gateBlockers.push("weekly Connects cap would be exceeded");
     }
     if (gateBlockers.length === 0 && plannedSpend + observation.connects_cost > observation.connects_balance_observed) {
       gateBlockers.push("planned Connects spend exceeds observed balance");
     }
+    if (gateBlockers.length === 0 && plannedSpend + observation.connects_cost > observation.connects_balance_observed - ACTIVE_PLAN.reserve_floor) {
+      gateBlockers.push("planned Connects spend would breach reserve floor");
+    }
 
     if (gateBlockers.length === 0) {
+      if (NO_SUBMIT) {
+        observation.safe_to_submit = false;
+        observation.blockers.push("no-submit smoke did not promote submit authorization");
+        actions.push(`${pkg.id}: no-submit smoke would promote after form inspect`);
+        continue;
+      }
       pkg.mode = "submit_authorized";
       pkg.max_authorized_connects = observation.connects_cost;
       plannedSpend += observation.connects_cost;
       authorizedCount += 1;
+      pkg.reserve_floor_after_spend = observation.connects_balance_observed - plannedSpend;
+      pkg.submission_gate_snapshot = {
+        connects_cost_observed: observation.connects_cost,
+        connects_balance_observed: observation.connects_balance_observed,
+        unknown_required_fields: observation.unknown_required_fields,
+        boost_selected: observation.boost_selected,
+        purchase_ui_seen: observation.purchase_ui_seen,
+        safe_to_submit: observation.safe_to_submit,
+      };
       pkg.risk_notes = `${pkg.risk_notes} Inspect gates passed; this concrete package ID was upgraded under the user-authorized delegated submit run.`;
       actions.push(`${pkg.id}: promoted to submit_authorized after form inspect`);
     } else {
@@ -921,6 +1070,150 @@ function authorizeAfterInspection(packages, observations, opportunitiesById) {
 
   actions.push(`authorized ${authorizedCount} packages after inspect; planned Connects spend ${plannedSpend}`);
   return { authorizedCount, plannedSpend };
+}
+
+function latestObservationByPackage(observations) {
+  const map = new Map();
+  for (const observation of observations) map.set(observation.proposal_package_id, observation);
+  return map;
+}
+
+function uniqueStrings(items) {
+  return [...new Set(items.filter(Boolean))];
+}
+
+function connectsSpent(observations) {
+  const latest = latestObservationByPackage(observations);
+  return submittedPackageIds.reduce((sum, packageId) => {
+    const observation = latest.get(packageId);
+    return sum + (observation?.connects_cost || 0);
+  }, 0);
+}
+
+function observedConnectsBalance(observations) {
+  const balances = observations
+    .map((observation) => observation.connects_balance_observed)
+    .filter((balance) => Number.isInteger(balance));
+  return balances.length ? balances.at(-1) : null;
+}
+
+function packageState(pkg, observation) {
+  if (submittedPackageIds.includes(pkg.id)) return "submitted";
+  if (pkg.mode === "submit_authorized") return "submit_authorized";
+  const text = (observation?.blockers || []).join("; ");
+  if (/manual review|unknown required fields|confirmation required|qualification/i.test(text)) return "manual_review_required";
+  return "tracked_not_submitted";
+}
+
+function classifyRunResult({ packages, observations }) {
+  if (submittedPackageIds.length) return "submitted";
+  const allBlockers = uniqueStrings([...blockers, ...observations.flatMap((obs) => obs.blockers)]);
+  const text = allBlockers.join("; ");
+  if (/Cloudflare|login page|session expired|job closed|no longer accepting|submit button|submit click did not verify|payment or purchase|boost requirement|off-platform|free test/i.test(text)) {
+    return "platform_blocked";
+  }
+  if (/Connects cost exceeds observed balance|planned Connects spend|daily Connects cap|weekly Connects cap|reserve floor|Buy Connects wall/i.test(text)) {
+    return "connects_insufficient";
+  }
+  if (/manual review|unknown required fields|post-click confirmation required|qualification/i.test(text)) {
+    return "manual_review_required";
+  }
+  if (packages.length) return "no_submission_quality_gate";
+  return "platform_blocked";
+}
+
+function nextActionForResult(result) {
+  if (result === "submitted") return "Monitor submitted proposals and client messages.";
+  if (result === "no_submission_quality_gate") return "Collect more recent opportunities under the active L3 plan; current candidates did not meet submit score gates.";
+  if (result === "connects_insufficient") return "Preserve reserve floor and wait for enough Connects or user-approved budget change.";
+  if (result === "manual_review_required") return "Review the tracked packages with manual fields or fixed-price gates before submit.";
+  if (result === "platform_blocked") return "Resolve the live platform blocker, then rerun the bounded Raw CDP cycle.";
+  return "Debug the runtime error before rerunning.";
+}
+
+function trackedBids({ packages, observations, opportunitiesById }) {
+  const latest = latestObservationByPackage(observations);
+  return packages.map((pkg) => {
+    const observation = latest.get(pkg.id);
+    const opportunity = opportunitiesById.get(pkg.opportunity_id);
+    return {
+      package_id: pkg.id,
+      job_id: pkg.job_id,
+      job_title: opportunity?.title || "Untitled job",
+      job_url: pkg.job_url,
+      state: packageState(pkg, observation),
+      connects_cost: observation?.connects_cost ?? null,
+      safe_to_submit: observation?.safe_to_submit ?? false,
+      reason: uniqueStrings(observation?.blockers || []).join("; ") || pkg.authorization_reason,
+    };
+  });
+}
+
+function buildSummaryMetrics({ opportunities, packages, observations, result }) {
+  const balance = observedConnectsBalance(observations);
+  const spent = connectsSpent(observations);
+  const tracked = trackedBids({
+    packages,
+    observations,
+    opportunitiesById: new Map(opportunities.map((opp) => [opp.id, opp])),
+  });
+  return {
+    found_jobs_count: opportunities.length,
+    candidate_cards_collected: candidateCardsCollected,
+    proposal_packages_count: packages.length,
+    submit_authorized_count: packages.filter((pkg) => pkg.mode === "submit_authorized").length,
+    submitted_count: submittedPackageIds.length,
+    tracked_bids: tracked,
+    connects_balance_observed: balance,
+    connects_spent: spent,
+    connects_remaining_after_spend: balance === null ? null : balance - spent,
+    blocker_summary: uniqueStrings([...blockers, ...observations.flatMap((obs) => obs.blockers)]),
+    next_action: nextActionForResult(result),
+  };
+}
+
+function writeBidTracker({ packages, observations, opportunitiesById }) {
+  const latest = latestObservationByPackage(observations);
+  const rows = packages.map((pkg) => {
+    const observation = latest.get(pkg.id);
+    const opportunity = opportunitiesById.get(pkg.opportunity_id);
+    const state = packageState(pkg, observation);
+    return {
+      id: `bid-${pkg.job_id}`,
+      run_id: RUN_ID,
+      job_id: pkg.job_id,
+      job_title: opportunity?.title || "Untitled job",
+      job_url: pkg.job_url,
+      package_id: pkg.id,
+      state,
+      connects_cost: observation?.connects_cost ?? null,
+      connects_spent: submittedPackageIds.includes(pkg.id) ? observation?.connects_cost ?? 0 : 0,
+      reason: uniqueStrings(observation?.blockers || []).join("; ") || pkg.authorization_reason,
+      source_session: SOURCE_SESSION,
+      updated_at: now(),
+    };
+  });
+  if (rows.length) upsertJsonl("data/bid-tracker.jsonl", rows);
+}
+
+function writeObservedBalance(summaryMetrics) {
+  if (!Number.isInteger(summaryMetrics.connects_balance_observed)) return;
+  appendLine("data/connects-ledger.jsonl", {
+    id: `connects-observe-balance-${RUN_STAMP}`,
+    date: RUN_DATE,
+    event_type: "observe_balance",
+    budget_scope: "active_autonomy_plan",
+    reserve_floor: ACTIVE_PLAN.reserve_floor,
+    weekly_cap: ACTIVE_PLAN.weekly_connects_cap,
+    daily_cap: ACTIVE_PLAN.daily_connects_cap,
+    opportunity_id: null,
+    proposal_package_id: null,
+    connects_delta: 0,
+    connects_balance_observed: summaryMetrics.connects_balance_observed,
+    reason: "Observed during bounded Raw CDP proposal form inspection.",
+    source_session: SOURCE_SESSION,
+    created_at: now(),
+  });
 }
 
 async function monitorOutcomes(packages) {
@@ -948,11 +1241,40 @@ async function monitorOutcomes(packages) {
   return packages.length;
 }
 
-function writeSession({ opportunities, packages, observations }) {
+function writePlatformAction(packages, result) {
+  appendLine("data/platform-actions.jsonl", {
+    id: `platform-action-${RUN_STAMP}`,
+    action_type: submittedPackageIds.length ? "submit_proposal" : "inspect_form",
+    execution_channel: EXECUTION_CHANNEL,
+    autonomy_level: AUTONOMY_LEVEL,
+    authorized_ids: packages.filter((pkg) => pkg.mode === "submit_authorized").map((pkg) => pkg.id),
+    forbidden_actions: [
+      "buy_connects",
+      "boost_proposal",
+      "send_unauthorized_message",
+      "accept_contract",
+      "decline_contract",
+      "off_platform_contact",
+    ],
+    volume_limit: MAX_SUBMISSIONS,
+    source_policy: "docs/autonomous-ops-policy.md",
+    source_session: SOURCE_SESSION,
+    result,
+    blockers: blockers.length ? blockers : ["no submitted packages"],
+    expires_at: `${RUN_DATE}T23:59:59Z`,
+    created_at: now(),
+  });
+}
+
+function writeSession({ opportunities, packages, observations, summaryMetrics = null, result = "error" }) {
   const submitted = submittedPackageIds.length ? submittedPackageIds.join(", ") : "none";
   const blockerText = blockers.length ? blockers.map((item) => `- ${item}`).join("\n") : "- none";
   const warningText = warnings.length ? warnings.map((item) => `- ${item}`).join("\n") : "- none";
   const obsRows = observations.map((obs) => `| ${obs.proposal_package_id} | ${obs.job_url} | ${obs.connects_cost ?? ""} | ${obs.connects_balance_observed ?? ""} | ${obs.required_fields.join("; ")} | ${obs.unknown_required_fields.join("; ")} | ${[...obs.warnings, ...obs.blockers].join("; ")} | ${obs.safe_to_submit} |`).join("\n");
+  const metrics = summaryMetrics || buildSummaryMetrics({ opportunities, packages, observations, result });
+  const trackedRows = metrics.tracked_bids.length
+    ? metrics.tracked_bids.map((bid) => `| ${bid.package_id} | ${bid.job_title} | ${bid.state} | ${bid.connects_cost ?? ""} | ${bid.reason} |`).join("\n")
+    : "| none | none | none |  | none |";
   const text = `# Execution Session Log
 
 ## Identity
@@ -960,27 +1282,57 @@ function writeSession({ opportunities, packages, observations }) {
 - Task file: tools/acquisition_os_live_test.mjs
 - Session file: ${SESSION_FILE}
 - Executor: Codex CDP-EXECUTOR
+- Autonomy level: ${AUTONOMY_LEVEL}
+- Execution channel: ${EXECUTION_CHANNEL}
 - Base commit: ${baseCommit()}
 - Result commit: none
 - Start time: ${runStartedAt}
 - End time: ${now()}
 
+## Outcome Metrics
+
+- Result: ${result}
+- Found jobs: ${metrics.found_jobs_count}
+- Candidate cards collected: ${metrics.candidate_cards_collected}
+- Proposal packages: ${metrics.proposal_packages_count}
+- Submit authorized: ${metrics.submit_authorized_count}
+- Submitted: ${metrics.submitted_count}
+- Connects observed: ${metrics.connects_balance_observed ?? "unknown"}
+- Connects spent: ${metrics.connects_spent}
+- Connects remaining after spend: ${metrics.connects_remaining_after_spend ?? "unknown"}
+- Next action: ${metrics.next_action}
+
+| Package ID | Job Title | State | Connects Cost | Reason |
+|---|---|---|---:|---|
+${trackedRows}
+
 ## Runtime Status
 
 - CDP status: Raw CDP at 127.0.0.1:9222
 - Upwork login status: checked before collection
-- Input proposal package IDs: ${observations.map((obs) => obs.proposal_package_id).join(", ") || "none"}
+- Input proposal package IDs: ${packages.map((pkg) => pkg.id).join(", ") || "none"}
+- Input message package IDs: none
+- Platform action IDs: platform-action-${RUN_STAMP}
 
 ## Connects
 
 - Connects observed: recorded per form observation when visible
-- Connects spent: ${observations.filter((obs) => submittedPackageIds.includes(obs.proposal_package_id)).reduce((sum, obs) => sum + (obs.connects_cost || 0), 0)}
+- Connects spent: ${metrics.connects_spent}
+- Daily cap: ${budgetSnapshot(metrics.connects_balance_observed).daily_connects_cap}
+- Weekly cap: ${budgetSnapshot(metrics.connects_balance_observed).weekly_connects_cap}
+- Reserve floor: ${budgetSnapshot(metrics.connects_balance_observed).reserve_floor}
 
 ## Form Observations
 
 | Proposal Package ID | Job URL | Connects Cost | Observed Balance | Required Fields | Unknown Required Fields | Warnings | Safe To Submit |
 |---|---|---:|---:|---|---|---|---|
 ${obsRows}
+
+## Message Observations
+
+| Message Package ID | Thread URL | Mode | Authorized | Sent | Blockers |
+|---|---|---|---|---|---|
+| none | none | none | false | false | none |
 
 ## Actions Taken
 
@@ -991,6 +1343,11 @@ ${actions.map((item) => `- ${item}`).join("\n")}
 - Mode: ${MODE}
 - Submit attempted: ${submittedPackageIds.length ? "yes" : "no"}
 - Submit result: ${submitted}
+
+## Message Status
+
+- Message send attempted: no
+- Message send result: none
 
 ## Blockers
 
@@ -1008,10 +1365,12 @@ ${warningText}
 - data/connects-ledger.jsonl
 - data/form-observations.jsonl
 - data/runs.jsonl
+- data/platform-actions.jsonl
+- data/bid-tracker.jsonl
 
 ## Risk Judgment
 
-- Submitted only package-specific authorizations that passed gates.
+- Proposal actions stayed package-scoped. No-submit smoke runs do not promote submit authorization.
 - No Buy Connects, boost, client message, screenshot, cookie, credential, IP, or Cloudflare Ray ID was saved.
 
 ## Next Action For Manager
@@ -1025,31 +1384,50 @@ ${warningText}
 - data/form-observations.jsonl
 - data/outcomes.jsonl
 - data/runs.jsonl
+- data/platform-actions.jsonl
+- data/bid-tracker.jsonl
 - ${SESSION_FILE}
 `;
   writeText(SESSION_FILE, text);
 }
 
-function writeAuditPatchIfNeeded(observations) {
+function writeAuditPatchIfNeeded(observations, result) {
   if (submittedPackageIds.length) return;
   const reason = blockers.find((item) => /Cloudflare|login/i.test(item))
     || observations.flatMap((obs) => obs.blockers).find(Boolean)
-    || "no high-quality opportunity passed submit gates";
+    || "no opportunity passed submit gates";
+  const recommendation = result === "no_submission_quality_gate"
+    ? "Collect more candidates and use the current submit-score gates instead of treating the run as a platform safety block."
+    : "Keep the submit gates unchanged and rerun only after the blocker is resolved.";
   appendLine("data/policy-patches.jsonl", {
     id: `patch-${RUN_STAMP}`,
     source_session: SOURCE_SESSION,
     patch_type: "blocked-run-classification",
     finding: reason,
-    recommendation: "Keep the submit gates unchanged; rerun collection only when CDP pages return real job content and a package has observed Connects cost.",
+    recommendation,
     created_at: now(),
   });
+}
+
+function gitCloseout(filesChanged, result) {
+  if (!GIT_CLOSEOUT) return;
+  runCommand("node", ["tools/validate_data_schemas.mjs"]);
+  runCommand("git", ["add", "--", ...filesChanged]);
+  const staged = runCommand("git", ["diff", "--cached", "--name-only"]);
+  if (!staged) {
+    actions.push("git closeout found no staged run outputs");
+    return;
+  }
+  runCommand("git", ["commit", "-m", `upwork acquisition cycle ${RUN_DATE} ${result}`]);
+  runCommand("git", ["push"]);
+  actions.push("git closeout committed and pushed run outputs");
 }
 
 async function main() {
   if (!fs.existsSync(abs("AGENTS.md"))) throw new Error("Run from repository root");
   ensureDir("data");
   ensureDir("sessions");
-  for (const rel of ["data/jobs.jsonl", "data/proposal-packages.jsonl", "data/connects-ledger.jsonl", "data/form-observations.jsonl", "data/outcomes.jsonl", "data/policy-patches.jsonl", "data/runs.jsonl"]) {
+  for (const rel of ["data/jobs.jsonl", "data/proposal-packages.jsonl", "data/connects-ledger.jsonl", "data/form-observations.jsonl", "data/outcomes.jsonl", "data/policy-patches.jsonl", "data/platform-actions.jsonl", "data/bid-tracker.jsonl", "data/runs.jsonl"]) {
     if (!fs.existsSync(abs(rel))) writeText(rel, "");
   }
 
@@ -1057,7 +1435,9 @@ async function main() {
   cdp = await connectCdp();
   await checkLoginAndNotifications();
 
-  actions.push("planned delegated submit run with available-balance cap and no Buy Connects");
+  actions.push(NO_SUBMIT
+    ? "planned no-submit live smoke with available-balance cap and no Buy Connects"
+    : "planned delegated submit run with available-balance cap and no Buy Connects");
   const collected = await collectOpportunities();
   if (!collected.length) blockers.push("no opportunities collected from live pages");
   const scored = collected.map(scoreOpportunity);
@@ -1081,46 +1461,57 @@ async function main() {
   writeJsonl("data/proposal-packages.jsonl", packages);
 
   const executable = packages.filter((pkg) => pkg.mode === "submit_authorized").slice(0, MAX_SUBMISSIONS);
-  if (!executable.length) blockers.push("no package met submit_authorized threshold");
+  if (!executable.length) blockers.push("no package met submit score and hard gates");
+  if (NO_SUBMIT && executable.length) {
+    actions.push(`no-submit smoke skipped ${executable.length} executable submit step(s)`);
+    blockers.push("no-submit smoke did not attempt final submit");
+  }
   for (const pkg of executable) {
+    if (NO_SUBMIT) continue;
     const obs = await inspectAndMaybeSubmit(pkg, { attemptSubmit: true });
     observations.push(obs);
   }
   writeJsonl("data/form-observations.jsonl", observations);
 
   await monitorOutcomes(packages);
-  writeAuditPatchIfNeeded(observations);
-  writeSession({ opportunities: scored, packages, observations });
+  const result = classifyRunResult({ packages, observations });
+  const opportunitiesById = new Map(scored.map((opp) => [opp.id, opp]));
+  writeBidTracker({ packages, observations, opportunitiesById });
+  const summaryMetrics = buildSummaryMetrics({ opportunities: scored, packages, observations, result });
+  writeObservedBalance(summaryMetrics);
+  writeAuditPatchIfNeeded(observations, result);
+  writePlatformAction(packages, result);
+  writeSession({ opportunities: scored, packages, observations, summaryMetrics, result });
 
   appendLine("data/runs.jsonl", {
     id: RUN_ID,
     task_file: "tools/acquisition_os_live_test.mjs",
     session_file: SESSION_FILE,
     mode: MODE,
+    autonomy_level: AUTONOMY_LEVEL,
+    execution_channel: EXECUTION_CHANNEL,
+    policy_version: POLICY_VERSION,
+    budget_snapshot: budgetSnapshot(summaryMetrics.connects_balance_observed),
+    authorized_action_ids: [`platform-action-${RUN_STAMP}`],
     started_at: runStartedAt,
     ended_at: now(),
     input_ids: packages.map((pkg) => pkg.id),
     actions_taken: actions,
-    files_changed: [
-      "data/jobs.jsonl",
-      "data/proposal-packages.jsonl",
-      "data/connects-ledger.jsonl",
-      "data/form-observations.jsonl",
-      "data/outcomes.jsonl",
-      "data/policy-patches.jsonl",
-      "data/runs.jsonl",
-      SESSION_FILE,
-    ],
-    result: submittedPackageIds.length ? "submitted" : "blocked",
+    files_changed: runOutputFiles(),
+    result,
     blockers: blockers.length ? blockers : observations.flatMap((obs) => obs.blockers),
+    summary_metrics: summaryMetrics,
   });
+  gitCloseout(runOutputFiles(), result);
 
   console.log(JSON.stringify({
-    result: submittedPackageIds.length ? "submitted" : "blocked",
-    opportunities: scored.length,
-    packages: packages.length,
+    result,
+    opportunities: summaryMetrics.found_jobs_count,
+    packages: summaryMetrics.proposal_packages_count,
     executable: executable.length,
     submitted: submittedPackageIds,
+    summary_metrics: summaryMetrics,
+    no_submit: NO_SUBMIT,
     blockers,
     warnings,
     session: SESSION_FILE,
@@ -1131,12 +1522,18 @@ main()
   .catch((error) => {
     blockers.push(error.message);
     try {
-      writeSession({ opportunities: [], packages: [], observations: [] });
+      const summaryMetrics = buildSummaryMetrics({ opportunities: [], packages: [], observations: [], result: "error" });
+      writeSession({ opportunities: [], packages: [], observations: [], summaryMetrics, result: "error" });
       appendLine("data/runs.jsonl", {
         id: RUN_ID,
         task_file: "tools/acquisition_os_live_test.mjs",
         session_file: SESSION_FILE,
         mode: MODE,
+        autonomy_level: AUTONOMY_LEVEL,
+        execution_channel: EXECUTION_CHANNEL,
+        policy_version: POLICY_VERSION,
+        budget_snapshot: budgetSnapshot(summaryMetrics.connects_balance_observed),
+        authorized_action_ids: [],
         started_at: runStartedAt,
         ended_at: now(),
         input_ids: [],
@@ -1144,6 +1541,7 @@ main()
         files_changed: ["data/runs.jsonl", SESSION_FILE],
         result: "error",
         blockers,
+        summary_metrics: summaryMetrics,
       });
     } catch {
       // no-op

@@ -6,8 +6,23 @@ Connects are investment capital. The system should spend them only when expected
 
 - Set a weekly Connects budget before collecting jobs.
 - Set a daily cap before scoring opportunities.
+- Set a reserve floor before delegated submit.
 - Reserve Connects for high-fit late-week opportunities.
 - Record every observed cost, spend, refund, and balance in the spend ledger.
+- Do not authorize a submit if the observed spend would take the account below the reserve floor.
+
+## Earning Connects
+
+Track official Connects earning paths without gaming them:
+
+- Profile setup, identity verification, and available onboarding or learning tasks.
+- Monthly free Connects when the account is eligible.
+- Rising Talent, Top Rated, and Top Rated Plus badge rewards.
+- Eligible activity rewards from quality proposal activity.
+- Interview rewards from established clients.
+- First successful boost reward only if a specific boosted proposal is separately authorized.
+
+Do not submit weak proposals to chase activity rewards. Reward eligibility is a secondary signal; expected contract value is the primary reason to spend Connects.
 
 ## Spend Ledger
 
@@ -17,8 +32,19 @@ Each Connects event should be recorded with:
 - Proposal package ID.
 - Connects delta.
 - Observed balance.
+- Budget scope.
+- Daily cap, weekly cap, and reserve floor when relevant.
 - Reason.
 - Source session.
+
+Allowed event types:
+
+- `observe_balance`
+- `reserve`
+- `spend`
+- `refund`
+- `reward`
+- `release_reserve`
 
 ## Client Quality Rules
 
@@ -53,6 +79,8 @@ Treat weak client quality as a reason to reduce max authorized Connects or choos
 - Fixed-price budgets of `$1,000+` may use a `$500` first milestone after form inspection.
 - The cover letter must state that a fixed-price bid is for a first milestone only.
 - Do not spend Connects when the expected value band is low and competition is high.
+- Do not spend below the active reserve floor.
+- Do not spend on a proposal only to qualify for a Connects reward.
 
 ## Minimum Fields Before Spending Connects
 

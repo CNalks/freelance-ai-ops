@@ -8,13 +8,90 @@
     "task_file": { "type": "string" },
     "session_file": { "type": "string" },
     "mode": { "type": "string" },
+    "autonomy_level": { "type": "string" },
+    "execution_channel": { "type": "string" },
+    "policy_version": { "type": "string" },
+    "budget_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operating_mandate_id": { "type": "string" },
+        "daily_connects_cap": { "type": ["integer", "null"] },
+        "weekly_connects_cap": { "type": ["integer", "null"] },
+        "reserve_floor": { "type": ["integer", "null"] },
+        "connects_balance_observed": { "type": ["integer", "null"] }
+      },
+      "required": [
+        "daily_connects_cap",
+        "weekly_connects_cap",
+        "reserve_floor",
+        "connects_balance_observed"
+      ]
+    },
+    "authorized_action_ids": { "type": "array", "items": { "type": "string" } },
     "started_at": { "type": "string" },
     "ended_at": { "type": "string" },
     "input_ids": { "type": "array", "items": { "type": "string" } },
     "actions_taken": { "type": "array", "items": { "type": "string" } },
     "files_changed": { "type": "array", "items": { "type": "string" } },
     "result": { "type": "string" },
-    "blockers": { "type": "array", "items": { "type": "string" } }
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "summary_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "found_jobs_count": { "type": "integer" },
+        "candidate_cards_collected": { "type": "integer" },
+        "proposal_packages_count": { "type": "integer" },
+        "submit_authorized_count": { "type": "integer" },
+        "submitted_count": { "type": "integer" },
+        "tracked_bids": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "package_id": { "type": "string" },
+              "job_id": { "type": "string" },
+              "job_title": { "type": "string" },
+              "job_url": { "type": "string" },
+              "state": { "type": "string" },
+              "connects_cost": { "type": ["integer", "null"] },
+              "safe_to_submit": { "type": "boolean" },
+              "reason": { "type": "string" }
+            },
+            "required": [
+              "package_id",
+              "job_id",
+              "job_title",
+              "job_url",
+              "state",
+              "connects_cost",
+              "safe_to_submit",
+              "reason"
+            ]
+          }
+        },
+        "connects_balance_observed": { "type": ["integer", "null"] },
+        "connects_spent": { "type": "integer" },
+        "connects_remaining_after_spend": { "type": ["integer", "null"] },
+        "blocker_summary": { "type": "array", "items": { "type": "string" } },
+        "next_action": { "type": "string" }
+      },
+      "required": [
+        "found_jobs_count",
+        "candidate_cards_collected",
+        "proposal_packages_count",
+        "submit_authorized_count",
+        "submitted_count",
+        "tracked_bids",
+        "connects_balance_observed",
+        "connects_spent",
+        "connects_remaining_after_spend",
+        "blocker_summary",
+        "next_action"
+      ]
+    }
   },
   "required": [
     "id",

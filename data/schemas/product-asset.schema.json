@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProductAsset",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "showcase_pack_id": { "type": "string" },
+    "asset_type": { "type": "string" },
+    "status": { "type": "string" },
+    "target_category": { "type": "string" },
+    "proposal_use_case": { "type": "string" },
+    "evidence_url": { "type": ["string", "null"] },
+    "gap_reason": { "type": "string" },
+    "priority": { "type": "string" },
+    "created_at": { "type": "string" }
+  },
+  "required": [
+    "id",
+    "showcase_pack_id",
+    "asset_type",
+    "status",
+    "target_category",
+    "proposal_use_case",
+    "evidence_url",
+    "gap_reason",
+    "priority",
+    "created_at"
+  ]
+}

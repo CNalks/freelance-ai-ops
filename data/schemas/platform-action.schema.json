@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PlatformAction",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "action_type": { "type": "string" },
+    "execution_channel": { "type": "string" },
+    "autonomy_level": { "type": "string" },
+    "authorized_ids": { "type": "array", "items": { "type": "string" } },
+    "forbidden_actions": { "type": "array", "items": { "type": "string" } },
+    "volume_limit": { "type": ["integer", "null"] },
+    "source_policy": { "type": "string" },
+    "source_session": { "type": ["string", "null"] },
+    "result": { "type": "string" },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "expires_at": { "type": "string" },
+    "created_at": { "type": "string" }
+  },
+  "required": [
+    "id",
+    "action_type",
+    "execution_channel",
+    "autonomy_level",
+    "authorized_ids",
+    "forbidden_actions",
+    "volume_limit",
+    "source_policy",
+    "source_session",
+    "result",
+    "blockers",
+    "expires_at",
+    "created_at"
+  ]
+}

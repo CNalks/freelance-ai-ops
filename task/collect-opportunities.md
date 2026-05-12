@@ -2,7 +2,7 @@
 
 ## Goal
 
-Collect candidate Upwork opportunities into structured records.
+Collect candidate Upwork opportunities into structured records through bounded human-like search.
 
 ## Inputs
 
@@ -18,7 +18,7 @@ Collect candidate Upwork opportunities into structured records.
 ## Steps
 
 1. Read the daily plan and current opportunity records.
-2. Collect candidate jobs.
+2. Collect candidate jobs through the authorized execution channel.
 3. Use visible page data only; do not store credentials, cookies, screenshots, IPs, Cloudflare Ray IDs, or private page artifacts.
 4. Record each opportunity with the required schema fields.
 5. If a source hits Cloudflare, login, CAPTCHA, verification, or blocked access, record the blocker and stop that source.
@@ -32,6 +32,7 @@ Collect candidate Upwork opportunities into structured records.
 - CAPTCHA, abnormal verification, or blocked access.
 - A job cannot be represented with the opportunity schema.
 - The page is a Cloudflare interstitial instead of job content.
+- Raw CDP action exceeds active volume limits or task scope.
 
 ## Files To Read
 
@@ -53,7 +54,7 @@ Every live CDP collection run writes `sessions/*.md`, even when blocked before c
 
 ## Safety Rules
 
-- Raw CDP only for future authorized browser collection.
+- Raw CDP only as bounded human-like browser operation.
 - Do not submit proposals.
 - Do not buy Connects.
 - Do not send messages.

@@ -6,6 +6,7 @@
   "properties": {
     "id": { "type": "string" },
     "opportunity_id": { "type": "string" },
+    "job_id": { "type": "string" },
     "job_url": { "type": "string" },
     "mode": { "type": "string" },
     "max_authorized_connects": { "type": "integer" },
@@ -27,6 +28,36 @@
     },
     "risk_notes": { "type": "string" },
     "stop_conditions": { "type": "array", "items": { "type": "string" } },
+    "autonomy_level": { "type": "string" },
+    "execution_channel": { "type": "string" },
+    "operating_mandate_id": { "type": ["string", "null"] },
+    "authorization_reason": { "type": "string" },
+    "reserve_floor_after_spend": { "type": ["integer", "null"] },
+    "authorization_expires_at": { "type": "string" },
+    "platform_channel_required": { "type": "string" },
+    "product_offer_id": { "type": "string" },
+    "asset_readiness": { "type": "string" },
+    "submission_gate_snapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "connects_cost_observed": { "type": ["integer", "null"] },
+        "connects_balance_observed": { "type": ["integer", "null"] },
+        "unknown_required_fields": { "type": "array", "items": { "type": "string" } },
+        "boost_selected": { "type": "boolean" },
+        "purchase_ui_seen": { "type": "boolean" },
+        "safe_to_submit": { "type": "boolean" }
+      },
+      "required": [
+        "connects_cost_observed",
+        "connects_balance_observed",
+        "unknown_required_fields",
+        "boost_selected",
+        "purchase_ui_seen",
+        "safe_to_submit"
+      ]
+    },
+    "message_followup_policy": { "type": "string" },
     "created_at": { "type": "string" }
   },
   "required": [

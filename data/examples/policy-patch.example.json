@@ -1,0 +1,13 @@
+{
+  "id": "patch-example-001",
+  "source_session": "sessions/2026-05-10-example.md",
+  "patch_type": "blocked-run-classification",
+  "finding": "expected value is not high enough for submit",
+  "recommendation": "Review detail-page enrichment and scoring evidence before lowering submit gates.",
+  "proposed_change": "Keep the gate unchanged until two inspected opportunities show complete client spend and Connects evidence.",
+  "evidence": [
+    "data/form-observations.jsonl: missing submit-ready package"
+  ],
+  "scope": "submit-gate",
+  "created_at": "2026-05-10T00:00:00Z"
+}

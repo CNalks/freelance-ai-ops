@@ -1,6 +1,18 @@
 # Authorization Policy
 
-This policy resolves submit authority for the acquisition system. Task files and automations cannot grant broader authority than this document.
+This policy resolves submit authority for the acquisition system. Task files and automations cannot grant broader authority than this document or `docs/autonomous-ops-policy.md`.
+
+## Delegated Operating Mandate
+
+The user may grant agents broad business discretion for acquisition operations. That mandate lets the manager create and promote concrete proposal package IDs to `submit_authorized` without a separate user message for each package.
+
+The mandate does not remove item-level gates:
+
+- Submit authority must remain scoped to specific proposal package IDs and job IDs.
+- Platform execution must use a channel allowed by `docs/upwork-platform-rules.md`.
+- Buying Connects, boosted proposals, contract acceptance, contract decline, subscriptions, and off-platform conversion remain separate authorities.
+- Client messages require concrete `message_send_authorized` records.
+- Every live execution writes a session file.
 
 ## Default Mode
 
@@ -41,7 +53,10 @@ submit_authorized:
     - fill fields
     - submit only if all gates pass
   required_gates:
+    - active operating mandate allows delegated submit or user explicitly authorized this package
     - job_id is explicitly authorized
+    - proposal package ID is explicitly authorized
+    - platform execution channel is allowed
     - connects_cost <= authorized max_connects
     - connects_cost <= observed Connects balance
     - no unknown required fields
@@ -52,6 +67,22 @@ submit_authorized:
     - form validation passes
     - proposal package has cover letter, rate/bid, showcase selection, and risk note
     - fixed-price bids, if any, are approved first-milestone amounts
+
+message_send_authorized:
+  allowed:
+    - open existing Upwork message thread
+    - send only the authorized reply text
+  required_gates:
+    - active operating mandate allows delegated messages or user explicitly authorized this message
+    - message package ID is explicitly authorized
+    - execution channel is allowed
+    - existing Upwork thread URL is present
+    - reply contains no off-platform contact information
+    - reply contains no off-platform payment request or link
+    - reply does not accept or decline a contract
+    - reply does not agree to a price exception
+    - reply asks at most two clarification questions
+    - reply is under 150 words unless the client explicitly requested detail
 ```
 
 ## Forbidden Conditions
@@ -72,6 +103,10 @@ Stop if any condition appears:
 - Free test work.
 - Buy Connects or purchase wall.
 - Session expired or login page.
+- Execution channel is not allowed by `docs/upwork-platform-rules.md`.
+- Raw CDP action would exceed active volume limits or task scope.
+- Boost UI is selected or required without specific boost authorization.
+- Message would share contact information, request off-platform payment, accept or decline a contract, or agree to a price exception.
 
 ## Automation Rule
 

@@ -1,0 +1,21 @@
+{
+  "id": "platform-action-example-001",
+  "action_type": "submit_proposal",
+  "execution_channel": "raw_cdp_humanlike",
+  "autonomy_level": "L2",
+  "authorized_ids": [
+    "pkg-example-001"
+  ],
+  "forbidden_actions": [
+    "buy_connects",
+    "boost_proposal",
+    "off_platform_contact"
+  ],
+  "volume_limit": 1,
+  "source_policy": "docs/autonomous-ops-policy.md",
+  "source_session": null,
+  "result": "authorized_pending_execution",
+  "blockers": [],
+  "expires_at": "2026-05-11T00:00:00Z",
+  "created_at": "2026-05-10T00:00:00Z"
+}

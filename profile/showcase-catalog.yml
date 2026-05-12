@@ -13,6 +13,9 @@ showcase_packs:
       - unclear backend scope
     proof_assets:
       - portfolio/demo-fastapi-llm
+    productized_offer: "FastAPI LLM endpoint or workflow shipped as a bounded first milestone."
+    asset_readiness: ready
+    portfolio_gap: ""
     proposal_angle: "I can ship a focused Python API layer with clear endpoints, typed payloads, and LLM features that are easy to test."
     pricing_anchor: "Hourly for evolving API work, fixed milestone for a bounded endpoint set."
     default_clarifying_question: "Which endpoints and LLM actions need to be in the first working milestone?"
@@ -30,6 +33,9 @@ showcase_packs:
       - no target user flow
     proof_assets:
       - portfolio/demo-rag-chatbot
+    productized_offer: "Document-grounded RAG prototype with ingestion, retrieval, and API behavior separated."
+    asset_readiness: ready
+    portfolio_gap: ""
     proposal_angle: "I can build a retrieval chatbot around your actual content, with ingestion, retrieval, and API behavior separated cleanly."
     pricing_anchor: "Fixed discovery and prototype milestone, then hourly iteration for retrieval quality."
     default_clarifying_question: "What content sources should the chatbot answer from in the first version?"
@@ -46,6 +52,9 @@ showcase_packs:
       - purely visual redesign
     proof_assets:
       - https://cnalks.github.io/freelance-ai-ops/
+    productized_offer: "AI workflow dashboard slice with queues, metrics, and review states."
+    asset_readiness: ready
+    portfolio_gap: ""
     proposal_angle: "I can turn an AI workflow into a usable operations dashboard with clear metrics, queues, and review states."
     pricing_anchor: "Fixed UI slice for static dashboard, hourly when live integrations are required."
     default_clarifying_question: "Which metrics or workflow states do you need to see on day one?"
@@ -63,6 +72,9 @@ showcase_packs:
     proof_assets:
       - AI Ops Dashboard
       - FastAPI LLM backend
+    productized_offer: "One CRM lead-stage automation with AI-assisted draft or follow-up logic."
+    asset_readiness: partial
+    portfolio_gap: "Needs a concrete CRM workflow case study or demo path."
     proposal_angle: "I can connect lead data, follow-up logic, and AI drafting into a controlled workflow that keeps human approval where needed."
     pricing_anchor: "Fixed first milestone for one pipeline path, then hourly expansion."
     default_clarifying_question: "Which CRM and which lead stage should the first automation cover?"
@@ -80,6 +92,9 @@ showcase_packs:
     proof_assets:
       - dashboard
       - FastAPI backend
+    productized_offer: "Smallest useful MVP workflow with one accepted first milestone."
+    asset_readiness: partial
+    portfolio_gap: "Needs a clearer product-slice case study tied to current dashboard and backend demos."
     proposal_angle: "I can define and build the smallest useful product slice first, with a clear milestone and testable acceptance criteria."
     pricing_anchor: "Fixed milestone for the first slice, hourly only after the slice is accepted."
     default_clarifying_question: "What is the smallest workflow a user must complete for the MVP to be useful?"

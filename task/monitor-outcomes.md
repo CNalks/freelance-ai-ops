@@ -2,7 +2,7 @@
 
 ## Goal
 
-Check proposal, message, and notification state without sending messages.
+Check proposal, message, and notification state, then hand off any replies to the message package flow.
 
 ## Inputs
 
@@ -13,17 +13,19 @@ Check proposal, message, and notification state without sending messages.
 ## Outputs
 
 - Outcome records.
+- Message package drafts when a client thread needs a reply.
 - Session log.
 - Optional human-readable monitoring report.
 
 ## Steps
 
 1. Read proposal package and outcome records.
-2. Use Raw CDP only when an authorized monitoring run requires live state.
+2. Use bounded human-like Raw CDP only when an authorized monitoring run requires live state.
 3. Check proposal state at `/nx/proposals/`.
 4. Check messages at `/ab/messages/rooms/` and notifications at `/ab/notifications/`.
 5. Record outcomes without sending replies.
-6. Write session and run records.
+6. Create draft message packages for reply-worthy client threads.
+7. Write session and run records.
 
 ## Stop Conditions
 
@@ -32,6 +34,7 @@ Check proposal, message, and notification state without sending messages.
 - A client message requires a response decision.
 - Any action would send a message, accept work, decline work, or purchase anything.
 - Message or notification pages require a response decision.
+- Raw CDP action exceeds active volume limits or task scope.
 
 ## Files To Read
 
@@ -39,6 +42,7 @@ Check proposal, message, and notification state without sending messages.
 - `docs/cdp-utils.md`
 - `data/proposal-packages.jsonl`
 - `data/outcomes.jsonl`
+- `data/message-packages.jsonl`
 - `templates/session-log-template.md`
 
 ## Files To Write

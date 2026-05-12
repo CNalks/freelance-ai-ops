@@ -16,18 +16,20 @@ Turn opportunity records into policy decisions and Connects allocations.
 - Proposal package authorizations.
 - Connects allocation records.
 - High-potential inspect candidates.
+- Product and portfolio gap signals.
 - Explicit `submit_authorized` package IDs only after apply-form inspection confirms all submit gates.
 
 ## Steps
 
 1. Read opportunities and current Connects ledger.
 2. Confirm each opportunity has minimum scoring fields.
-3. Score fit, client quality, competition, scope clarity, and risk.
+3. Score fit, client quality, competition, scope clarity, freshness, review potential, first-contract probability, portfolio value, and risk.
 4. Choose `skip`, `draft_only`, or `prefill_only` before form inspection; missing Connects cost must not prevent inspect.
 5. Emit high-potential `prefill_only` candidates for CDP form inspection.
-6. After CDP form observations exist, set `max_authorized_connects` from observed form cost.
-7. Use `submit_authorized` only for concrete package IDs with high fit, credible client quality, low or moderate competition, clear scope, non-low pricing, acceptable observed Connects cost, sufficient observed balance, and no forbidden risk.
-8. Write decision reason for every selected opportunity.
+6. Mark product or portfolio gaps that directly weaken a high-fit package.
+7. After CDP form observations exist, set `max_authorized_connects` from observed form cost.
+8. Use `submit_authorized` only for concrete package IDs with high fit, credible client quality, low or moderate competition, clear scope, non-low pricing, acceptable observed Connects cost, sufficient observed balance, reserve floor intact, and no forbidden risk.
+9. Write decision reason for every selected opportunity.
 
 ## Stop Conditions
 
@@ -35,7 +37,7 @@ Turn opportunity records into policy decisions and Connects allocations.
 - Client or job risk triggers forbidden conditions.
 - Budget is below the pricing policy minimum for meaningful fixed-scope work.
 - Connects cost is not observed for a package that would be submitted.
-- Connects cost exceeds daily cap, package cap, or observed balance after form inspection.
+- Connects cost exceeds daily cap, weekly cap, package cap, reserve floor, or observed balance after form inspection.
 
 ## Files To Read
 
@@ -44,12 +46,14 @@ Turn opportunity records into policy decisions and Connects allocations.
 - `data/schemas/opportunity.schema.json`
 - `data/jobs.jsonl`
 - `data/connects-ledger.jsonl`
+- `data/product-assets.jsonl`
 
 ## Files To Write
 
 - Updated opportunity decisions.
 - Proposal package authorization inputs.
 - `data/connects-ledger.jsonl` for budget reservations when used.
+- `data/product-assets.jsonl` for product or portfolio gaps when used.
 
 ## Session Requirements
 

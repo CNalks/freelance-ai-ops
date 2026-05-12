@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AutonomyPlan",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "run_id": { "type": ["string", "null"] },
+    "status": { "type": "string" },
+    "autonomy_level": { "type": "string" },
+    "execution_channel": { "type": "string" },
+    "daily_connects_cap": { "type": "integer" },
+    "weekly_connects_cap": { "type": "integer" },
+    "reserve_floor": { "type": "integer" },
+    "target_categories": { "type": "array", "items": { "type": "string" } },
+    "active_offer_ids": { "type": "array", "items": { "type": "string" } },
+    "allowed_actions": { "type": "array", "items": { "type": "string" } },
+    "volume_limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "search_sources": { "type": "integer" },
+        "job_pages": { "type": "integer" },
+        "proposal_forms": { "type": "integer" },
+        "proposal_submits": { "type": "integer" },
+        "message_threads": { "type": "integer" },
+        "message_sends": { "type": "integer" }
+      },
+      "required": [
+        "search_sources",
+        "job_pages",
+        "proposal_forms",
+        "proposal_submits",
+        "message_threads",
+        "message_sends"
+      ]
+    },
+    "expires_at": { "type": "string" },
+    "created_at": { "type": "string" }
+  },
+  "required": [
+    "id",
+    "run_id",
+    "status",
+    "autonomy_level",
+    "execution_channel",
+    "daily_connects_cap",
+    "weekly_connects_cap",
+    "reserve_floor",
+    "target_categories",
+    "active_offer_ids",
+    "allowed_actions",
+    "volume_limits",
+    "expires_at",
+    "created_at"
+  ]
+}

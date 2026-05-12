@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PolicyPatch",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "source_session": { "type": "string" },
+    "patch_type": { "type": "string" },
+    "finding": { "type": "string" },
+    "recommendation": { "type": "string" },
+    "proposed_change": { "type": "string" },
+    "evidence": { "type": "array", "items": { "type": "string" } },
+    "scope": { "type": "string" },
+    "created_at": { "type": "string" }
+  },
+  "required": [
+    "id",
+    "source_session",
+    "patch_type",
+    "finding",
+    "recommendation",
+    "created_at"
+  ]
+}

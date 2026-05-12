@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MessagePackage",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string" },
+    "thread_url": { "type": "string" },
+    "related_proposal_package_id": { "type": ["string", "null"] },
+    "message_type": { "type": "string" },
+    "mode": { "type": "string" },
+    "execution_channel": { "type": "string" },
+    "message_send_authorized": { "type": "boolean" },
+    "authorization_reason": { "type": "string" },
+    "gates_passed": { "type": "array", "items": { "type": "string" } },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "source_session": { "type": ["string", "null"] },
+    "client_message_summary": { "type": "string" },
+    "draft_reply": { "type": "string" },
+    "risk_notes": { "type": "string" },
+    "stop_conditions": { "type": "array", "items": { "type": "string" } },
+    "created_at": { "type": "string" }
+  },
+  "required": [
+    "id",
+    "thread_url",
+    "related_proposal_package_id",
+    "message_type",
+    "mode",
+    "execution_channel",
+    "message_send_authorized",
+    "authorization_reason",
+    "gates_passed",
+    "blockers",
+    "source_session",
+    "client_message_summary",
+    "draft_reply",
+    "risk_notes",
+    "stop_conditions",
+    "created_at"
+  ]
+}

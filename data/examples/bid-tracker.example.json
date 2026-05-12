@@ -1,0 +1,14 @@
+{
+  "id": "bid-22000000000000000001",
+  "run_id": "run-2026-05-12-acquisition-os-live-test-example",
+  "job_id": "22000000000000000001",
+  "job_title": "FastAPI LLM Backend",
+  "job_url": "https://www.upwork.com/jobs/FastAPI-LLM-Backend_~022000000000000000001/",
+  "package_id": "pkg-22000000000000000001",
+  "state": "tracked_not_submitted",
+  "connects_cost": 8,
+  "connects_spent": 0,
+  "reason": "Tracked after form inspection; not submitted yet.",
+  "source_session": "sessions/example.md",
+  "updated_at": "2026-05-12T00:00:00.000Z"
+}

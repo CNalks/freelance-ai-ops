@@ -2,7 +2,7 @@
 
 ## Goal
 
-Execute authorized proposal package actions through Raw CDP while keeping CDP subordinate to policy authorization.
+Execute authorized proposal package actions through bounded human-like Raw CDP while keeping CDP subordinate to policy authorization.
 
 ## Inputs
 
@@ -18,6 +18,7 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 - Inspected package gate decisions.
 - Session log.
 - Updated run record.
+- Platform action record.
 - Optional proposal tracker report.
 
 ## Steps
@@ -25,15 +26,16 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 1. Read proposal packages before opening any live page.
 2. Confirm each package mode and max Connects.
 3. Reject any package not listed by concrete ID for this run.
-4. Use Raw CDP only.
+4. Use Raw CDP only as bounded human-like browser operation.
 5. Open the job page and proposal form for `prefill_only` or `submit_authorized` packages.
 6. Inspect form structure before any submit decision.
 7. Record Connects cost, observed balance, required fields, optional fields, warnings, and blockers.
 8. Stop final submit on unknown required fields.
 9. Fill only authorized fields.
 10. Promote a concrete package ID to `submit_authorized` only after inspected gates pass under delegated run authority.
-11. Write form observations and session record.
-12. Submit only with `submit_authorized` and all gates passed.
+11. Record submit button visibility, boost state, purchase UI, qualification warnings, and validation errors.
+12. Write form observations, platform action records, and session record.
+13. Submit only with `submit_authorized` and all gates passed.
 
 ## Stop Conditions
 
@@ -52,6 +54,7 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 - Session expired or login page.
 - Package ID was not specifically authorized in the delegated run.
 - Boost UI is selected or required.
+- Raw CDP action exceeds active volume limits or task scope.
 - Fixed-price budget is below `$500`.
 - Fixed-price bid is not the approved `$300` or `$500` first-milestone amount.
 
@@ -62,11 +65,13 @@ Execute authorized proposal package actions through Raw CDP while keeping CDP su
 - `docs/cdp-utils.md`
 - `data/proposal-packages.jsonl`
 - `data/schemas/form-observation.schema.json`
+- `data/schemas/platform-action.schema.json`
 - `templates/session-log-template.md`
 
 ## Files To Write
 
 - `data/form-observations.jsonl`
+- `data/platform-actions.jsonl`
 - `data/runs.jsonl`
 - `sessions/*.md`
 - Human report files only when requested.
@@ -77,7 +82,7 @@ Every execution run writes `sessions/*.md` using `templates/session-log-template
 
 ## Safety Rules
 
-- Use Raw CDP only.
+- Use Raw CDP only as bounded human-like browser operation.
 - Never buy Connects.
 - Never click payment or purchase buttons.
 - Never send client messages.

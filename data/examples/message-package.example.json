@@ -1,0 +1,26 @@
+{
+  "id": "msgpkg-example-001",
+  "thread_url": "https://www.upwork.com/ab/messages/rooms/example",
+  "related_proposal_package_id": "pkg-example-001",
+  "message_type": "scope_question",
+  "mode": "draft_only",
+  "execution_channel": "none",
+  "message_send_authorized": false,
+  "authorization_reason": "Draft only; no live send requested.",
+  "gates_passed": [
+    "no_off_platform_contact",
+    "no_contract_decision",
+    "under_150_words"
+  ],
+  "blockers": [],
+  "source_session": null,
+  "client_message_summary": "Client asked whether the first milestone can cover one CRM workflow.",
+  "draft_reply": "Yes. I would start with one CRM workflow, define the trigger and expected output, then ship a small working milestone before expanding. Which CRM and lead stage should I use for the first pass?",
+  "risk_notes": "No contact info, no contract acceptance, one clarification question.",
+  "stop_conditions": [
+    "off_platform_contact",
+    "contract_offer",
+    "price_exception"
+  ],
+  "created_at": "2026-05-10T00:00:00Z"
+}

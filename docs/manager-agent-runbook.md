@@ -5,6 +5,8 @@ Manager agents design strategy and authorization. They do not operate the browse
 ## Read-First Checklist
 
 - `docs/acquisition-os-architecture.md`
+- `docs/autonomous-ops-policy.md`
+- `docs/upwork-platform-rules.md`
 - `docs/authorization-policy.md`
 - `docs/connects-policy.md`
 - `profile/showcase-catalog.yml`
@@ -30,7 +32,8 @@ Manager agents design strategy and authorization. They do not operate the browse
 2. Review opportunities.
 3. Allocate Connects.
 4. Produce authorized proposal package list.
-5. Emit task for CDP-EXECUTOR.
+5. Produce authorized message package list when client replies are safe to send.
+6. Emit task for CDP-EXECUTOR.
 
 ## Task Handoff Template
 
@@ -55,6 +58,7 @@ Manager agents design strategy and authorization. They do not operate the browse
 - Never click Buy Connects.
 - Stop on unknown required fields.
 - Submit only for `submit_authorized` packages after all gates pass.
+- Send only `message_send_authorized` replies after all gates pass.
 ```
 
 ## Audit Template
